@@ -161,8 +161,29 @@
   }
 
   // 初始化背景
-  switchBg();
-  startBgAuto();
+  // 记住背景自动切换状态
+  const autoBg = localStorage.getItem('autoBg');
+  const toggle = document.getElementById('bgToggle');
+  if (autoBg === 'on' || autoBg === null) {
+    toggle.checked = true;
+    switchBg();
+    startBgAuto();
+  } else {
+    toggle.checked = false;
+    stopBgAuto();
+  }
+
+  // 切换事件
+  toggle.addEventListener('change', function() {
+    if (this.checked) {
+      switchBg();
+      startBgAuto();
+      localStorage.setItem('autoBg', 'on');
+    } else {
+      stopBgAuto();
+      localStorage.setItem('autoBg', 'off');
+    }
+  });
   function updateClock() {
     const now = new Date();
     const time = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
