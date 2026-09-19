@@ -25,6 +25,8 @@
     --contact-bg-qq: rgba(0,150,255,0.15);
     --contact-bg-tg: rgba(0,150,200,0.15);
     --arrow-color: rgba(255,255,255,0.4);
+    --card-name: #fff;
+    --contact-name: #fff;
   }
   
   [data-theme="light"] {
@@ -53,6 +55,8 @@
     --contact-bg-qq: rgba(0,150,255,0.1);
     --contact-bg-tg: rgba(0,150,200,0.1);
     --arrow-color: rgba(0,0,0,0.35);
+    --card-name: #1f2937;
+    --contact-name: #1f2937;
   }
   
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -81,29 +85,85 @@
     background: linear-gradient(180deg, var(--overlay-start) 0%, var(--overlay-end) 100%);
   }
   
-  /* 底部固定按钮组 */
+  /* 底部固定控件组 */
   .fixed-bottom {
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 10;
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
+  }
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 8px;
+    padding: 4px 10px 4px 8px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .toggle-label {
+    font-size: 11px;
+    color: var(--btn-text);
+    user-select: none;
+    white-space: nowrap;
+  }
+  /* Toggle 开关 */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: 18px;
+    cursor: pointer;
+    transition: background 0.25s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    left: 2px;
+    top: 2px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s;
+  }
+  .switch input:checked + .slider {
+    background: var(--accent);
+  }
+  .switch input:checked + .slider::before {
+    transform: translateX(14px);
   }
   .fixed-bottom button {
-    padding: 6px 14px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--btn-bg);
     border: 1px solid var(--btn-border);
     border-radius: 8px;
     color: var(--btn-text);
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     transition: all 0.2s;
   }
-  .fixed-bottom button:hover,
-  .fixed-bottom button.active {
+  .fixed-bottom button:hover {
     background: var(--accent);
     color: #fff;
     border-color: var(--accent);
@@ -181,18 +241,20 @@
     flex-wrap: wrap;
   }
   .mini-widget {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
     padding: 8px 16px;
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
     color: var(--widget-text);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 12px var(--shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+      0 4px 12px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.1);
   }
   .mini-widget .icon { font-size: 16px; }
   .mini-widget .time { font-size: 15px; font-weight: 500; }
@@ -201,17 +263,19 @@
   .tabs {
     display: flex;
     gap: 4px;
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 12px;
     padding: 4px;
     margin-bottom: 20px;
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 12px var(--shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+      0 4px 12px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.1);
   }
   .tab-btn {
     padding: 8px 24px;
@@ -247,9 +311,9 @@
     gap: 12px;
   }
   .link-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
     padding: 16px;
     display: flex;
     align-items: center;
@@ -257,15 +321,19 @@
     text-decoration: none;
     color: var(--text);
     transition: all 0.25s;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 12px var(--shadow);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+      0 4px 16px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.1);
   }
   .link-card:hover {
-    background: var(--card-hover);
-    border-color: rgba(99,102,241,0.3);
+    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%);
+    border-color: rgba(255,255,255,0.25);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px var(--shadow-hover);
+    box-shadow:
+      0 8px 32px var(--shadow-hover),
+      inset 0 1px 0 rgba(255,255,255,0.2);
   }
   .link-card .card-icon {
     width: 48px;
@@ -285,7 +353,7 @@
     font-size: 15px;
     font-weight: 500;
     margin-bottom: 3px;
-    color: #fff;
+    color: var(--card-name);
   }
   .link-card .card-desc {
     font-size: 12px;
@@ -304,6 +372,24 @@
     transform: translateX(3px);
   }
   
+  /* 一言 */
+  .hitokoto {
+    text-align: center;
+    padding: 8px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+    line-height: 1.6;
+    user-select: none;
+  }
+  .hitokoto:hover {
+    color: var(--text);
+    background: var(--tab-hover);
+  }
+
   /* === 联系区 === */
   .contact-list {
     display: flex;
@@ -311,9 +397,9 @@
     gap: 12px;
   }
   .contact-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
     padding: 16px 20px;
     display: flex;
     align-items: center;
@@ -321,13 +407,15 @@
     text-decoration: none;
     color: var(--text);
     transition: all 0.25s;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 4px 12px var(--shadow);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow:
+      0 4px 16px var(--shadow),
+      inset 0 1px 0 rgba(255,255,255,0.1);
   }
   .contact-card:hover {
-    background: var(--card-hover);
-    border-color: rgba(99,102,241,0.3);
+    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%);
+    border-color: rgba(255,255,255,0.25);
     transform: translateY(-2px);
   }
   .contact-icon {
@@ -344,7 +432,7 @@
   .contact-icon.qqgrp { background: var(--contact-bg-qq); }
   .contact-icon.tg { background: var(--contact-bg-tg); }
   .contact-info { flex: 1; }
-  .contact-name { font-weight: 500; margin-bottom: 2px; color: #fff; }
+  .contact-name { font-weight: 500; margin-bottom: 2px; color: var(--contact-name); }
   .contact-desc { font-size: 12px; color: var(--text-muted); }
   
   /* === 页脚 === */
@@ -370,8 +458,6 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: gradientShift 4s ease infinite;
-    /* 防止父级 .footer color 覆盖 */
-    color: transparent !important;
   }
   @keyframes gradientShift {
     0% { background-position: 0% 50%; }
@@ -383,5 +469,6 @@
   @media (max-width: 640px) {
     .container { padding: 20px 16px; margin-top: 20px; margin-bottom: 20px; }
     .header h1 { font-size: 24px; }
-    .link-grid { grid-template-columns: 1fr; }
+    .link-grid { grid-template-columns: repeat(2, 1fr); }
+    .glass-card { padding: 16px 12px; }
   }
