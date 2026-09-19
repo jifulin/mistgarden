@@ -286,7 +286,7 @@
   .tabs {
       display: flex;
       gap: 4px;
-      background: linear-gradient(160deg, rgba(50,52,78,0.5) 0%, rgba(30,32,50,0.6) 100%);
+      background: linear-gradient(160deg, rgba(50,52,78,0.35) 0%, rgba(30,32,50,0.4) 100%);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 14px;
       padding: 4px;
@@ -509,34 +509,34 @@
     --overlay-end: rgba(255,255,255,0.7);
   }
   [data-theme="light"] .glass-card {
-    background: rgba(255,255,255,0.72);
-    border: 1px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.42);
+    border: 1px solid rgba(255,255,255,0.65);
     border-radius: 20px;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow:
       0 8px 32px rgba(0,0,0,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.9);
+      inset 0 1px 0 rgba(255,255,255,0.6);
     padding: 24px 20px;
   }
   [data-theme="light"] .glass-card::before { display: none; }
   [data-theme="light"] .mini-widget {
-    background: rgba(255,255,255,0.75);
-    border: 1px solid rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,255,255,0.6);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
   [data-theme="light"] .tabs {
-    background: rgba(255,255,255,0.75);
-    border: 1px solid rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,255,255,0.6);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
   [data-theme="light"] .link-card {
-    background: rgba(255,255,255,0.65);
-    border: 1px solid rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.55);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -547,8 +547,8 @@
     box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   }
   [data-theme="light"] .contact-card {
-    background: rgba(255,255,255,0.65);
-    border: 1px solid rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.4);
+    border: 1px solid rgba(255,255,255,0.55);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
