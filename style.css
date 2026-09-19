@@ -198,7 +198,7 @@
   .link-card .card-icon {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 12px; /* 圆角图标，改回直角改或删除此行 */
     overflow: hidden;
     flex-shrink: 0;
     background: rgba(255,255,255,0.05);
@@ -274,13 +274,32 @@
   .contact-name { font-weight: 500; margin-bottom: 2px; color: #fff; }
   .contact-desc { font-size: 12px; color: var(--text-muted); }
   
-  /* === 页脚 === */
   .footer {
     text-align: center;
     margin-top: 40px;
     padding: 20px;
-    color: rgba(255,255,255,0.4);
     font-size: 12px;
+  }
+  .footer a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer a:hover {
+    color: var(--accent);
+  }
+  #uptime {
+    background: linear-gradient(90deg, #fbcfe8, #f9a8d4, #e879f9, #c084fc);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
   
   /* === 响应式 === */

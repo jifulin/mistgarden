@@ -15,9 +15,7 @@
 
 <!-- 背景切换 -->
 <div class="bg-switch">
-  <button class="active" onclick="switchBg('anime1')">樱花</button>
-  <button onclick="switchBg('anime2')">星空</button>
-  <button onclick="switchBg('anime3')">城市</button>
+  <button class="active" onclick="switchBg()">随机</button>
 </div>
 
 <div class="container">
@@ -121,25 +119,25 @@
     </div>
   </div>
   
-  <div class="footer">
-    雾光庭院 · Design Preview
-  </div>
+  <div class="footer"><a href="https://github.com/jifulin/mistgarden" target="_blank">雾光庭院</a> · <span id="uptime"></span></div>
 </div>
 
 <script>
-  // 背景图片配置（使用公开 CDN 图片，适配 GitHub Pages）
-  const bgImages = {
-    anime1: 'https://img1.baidu.com/it/u=3181643731,2177419498&fm=253&fmt=auto&app=120&f=JPEG?w=1920&h=1080',
-    anime2: 'https://img2.baidu.com/it/u=3678945051,1617958670&fm=253&fmt=auto&app=120&f=JPEG?w=1920&h=1080',
-    anime3: 'https://img1.baidu.com/it/u=3724099946,3129786278&fm=253&fmt=auto&app=120&f=JPEG?w=1920&h=1080'
-  };
-  let currentBg = 'anime1';
+  // 背景图片配置（使用API获取随机横图）
+  const BG_API = 'https://api.lqay.cn/api/zxsjt/?cat=heng';
+  let currentBg = null;
   
-  function switchBg(type) {
-    currentBg = type;
-    document.getElementById('bgImage').style.backgroundImage = `url('${bgImages[type]}')`;
-    document.querySelectorAll('.bg-switch button').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+  async function switchBg() {
+    try {
+      const resp = await fetch(BG_API);
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      if (currentBg) URL.revokeObjectURL(currentBg);
+      currentBg = url;
+      document.getElementById('bgImage').style.backgroundImage = `url('${currentBg}')`;
+    } catch (e) {
+      console.error('Failed to load background image', e);
+    }
   }
   
   // 实时时钟
@@ -162,7 +160,26 @@
   }
   
   // 初始化背景
-  switchBg('anime1');
+  switchBg();
+
+  // 运行时间计数器
+  const startTime = new Date('2026-09-20T06:00:00+08:00');
+  function updateUptime() {
+    const now = new Date();
+    const diff = now - startTime;
+    if (diff < 0) {
+      document.getElementById('uptime').textContent = '网站运行中';
+      return;
+    }
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
+    document.getElementById('uptime').textContent = `网站已运行 ${days}天 ${String(hours).padStart(2,'0')}时 ${String(mins).padStart(2,'0')}分 ${String(secs).padStart(2,'0')}秒`;
+  }
+  updateUptime();
+  setInterval(updateUptime, 1000);
+
 </script>
 </body>
 </html>
