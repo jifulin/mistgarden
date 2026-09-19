@@ -82,7 +82,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, var(--overlay-start) 0%, var(--overlay-end) 100%);
+    background:
+      radial-gradient(ellipse at top, rgba(255,255,255,0.05) 0%, transparent 55%),
+      linear-gradient(180deg, var(--overlay-start) 0%, var(--overlay-end) 100%);
   }
   
   /* 底部固定控件组 */
@@ -180,20 +182,40 @@
     display: flex;
     flex-direction: column;
   }
-  /* 大毛玻璃卡片 */
-  .glass-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px var(--shadow);
-    padding: 24px 20px;
-    margin-top: 24px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
+  /* 亚克力大卡片（夜晚模式） */
+    .glass-card {
+      position: relative;
+      background:
+        linear-gradient(180deg,
+          rgba(20,22,38,0.62) 0%,
+          rgba(16,18,32,0.72) 40%,
+          rgba(12,14,26,0.78) 100%);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 24px;
+      backdrop-filter: blur(48px) saturate(140%);
+      -webkit-backdrop-filter: blur(48px) saturate(140%);
+      box-shadow:
+        0 24px 64px rgba(0,0,0,0.5),
+        0 8px 24px var(--shadow),
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        inset 0 -1px 0 rgba(255,255,255,0.02);
+      padding: 24px 20px;
+      margin-top: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    /* 亚克力顶部高光线 */
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 8%;
+      right: 8%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+      pointer-events: none;
+    }
   
   /* === 头部区域 === */
   .header {
@@ -241,42 +263,43 @@
     flex-wrap: wrap;
   }
   .mini-widget {
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--widget-text);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow:
-      0 4px 12px var(--shadow),
-      inset 0 1px 0 rgba(255,255,255,0.1);
-  }
+      background: linear-gradient(160deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--widget-text);
+      backdrop-filter: blur(28px) saturate(140%);
+      -webkit-backdrop-filter: blur(28px) saturate(140%);
+      box-shadow:
+        0 4px 16px var(--shadow),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    }
   .mini-widget .icon { font-size: 16px; }
   .mini-widget .time { font-size: 15px; font-weight: 500; }
+  .mini-widget .divider { color: var(--text-muted); margin: 0 4px; }
   
   /* === 标签切换 === */
   .tabs {
-    display: flex;
-    gap: 4px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 4px;
-    margin-bottom: 20px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow:
-      0 4px 12px var(--shadow),
-      inset 0 1px 0 rgba(255,255,255,0.1);
-  }
+      display: flex;
+      gap: 4px;
+      background: linear-gradient(160deg, rgba(50,52,78,0.5) 0%, rgba(30,32,50,0.6) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 20px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      backdrop-filter: blur(24px) saturate(130%);
+      -webkit-backdrop-filter: blur(24px) saturate(130%);
+      box-shadow:
+        0 4px 16px var(--shadow),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    }
   .tab-btn {
     padding: 8px 24px;
     border: none;
@@ -311,34 +334,34 @@
     gap: 12px;
   }
   .link-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.25s;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    box-shadow:
-      0 4px 16px var(--shadow),
-      inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .link-card:hover {
-    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%);
-    border-color: rgba(255,255,255,0.25);
-    transform: translateY(-2px);
-    box-shadow:
-      0 8px 32px var(--shadow-hover),
-      inset 0 1px 0 rgba(255,255,255,0.2);
-  }
+      background: linear-gradient(160deg, rgba(26,28,46,0.55) 0%, rgba(15,17,30,0.65) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.25s;
+      backdrop-filter: blur(30px) saturate(140%);
+      -webkit-backdrop-filter: blur(30px) saturate(140%);
+      box-shadow:
+        0 4px 16px var(--shadow),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .link-card:hover {
+      background: linear-gradient(160deg, rgba(35,38,60,0.7) 0%, rgba(20,22,40,0.75) 100%);
+      border-color: rgba(255,255,255,0.18);
+      transform: translateY(-2px);
+      box-shadow:
+        0 10px 32px var(--shadow-hover),
+        inset 0 1px 0 rgba(255,255,255,0.15);
+    }
   .link-card .card-icon {
     width: 48px;
     height: 48px;
-    border-radius: 12px; /* 圆角图标，改回直角改或删除此行 */
+    border-radius: 50%; /* 圆形图标，改回圆角方形改12px或删除此行 */
     overflow: hidden;
     flex-shrink: 0;
     background: var(--icon-bg);
@@ -346,7 +369,7 @@
   .link-card .card-icon img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
   }
   .link-card .card-info { flex: 1; min-width: 0; }
   .link-card .card-name {
@@ -397,27 +420,27 @@
     gap: 12px;
   }
   .contact-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 16px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.25s;
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    box-shadow:
-      0 4px 16px var(--shadow),
-      inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  .contact-card:hover {
-    background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%);
-    border-color: rgba(255,255,255,0.25);
-    transform: translateY(-2px);
-  }
+      background: linear-gradient(160deg, rgba(26,28,46,0.55) 0%, rgba(15,17,30,0.65) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.25s;
+      backdrop-filter: blur(30px) saturate(140%);
+      -webkit-backdrop-filter: blur(30px) saturate(140%);
+      box-shadow:
+        0 4px 16px var(--shadow),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .contact-card:hover {
+      background: linear-gradient(160deg, rgba(35,38,60,0.7) 0%, rgba(20,22,40,0.75) 100%);
+      border-color: rgba(255,255,255,0.18);
+      transform: translateY(-2px);
+    }
   .contact-icon {
     width: 48px;
     height: 48px;
@@ -471,4 +494,60 @@
     .header h1 { font-size: 24px; }
     .link-grid { grid-template-columns: repeat(2, 1fr); }
     .glass-card { padding: 16px 12px; }
+  }
+
+  /* ===== 白天模式覆盖：简洁浅色 ===== */
+  [data-theme="light"] {
+    /* 背景遮罩 */
+    --overlay-start: rgba(255,255,255,0.45);
+    --overlay-end: rgba(255,255,255,0.7);
+  }
+  [data-theme="light"] .glass-card {
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 20px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    padding: 24px 20px;
+  }
+  [data-theme="light"] .glass-card::before { display: none; }
+  [data-theme="light"] .mini-widget {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.9);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  [data-theme="light"] .tabs {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.9);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  [data-theme="light"] .link-card {
+    background: rgba(255,255,255,0.65);
+    border: 1px solid rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  [data-theme="light"] .link-card:hover {
+    background: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  [data-theme="light"] .contact-card {
+    background: rgba(255,255,255,0.65);
+    border: 1px solid rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  [data-theme="light"] .contact-card:hover {
+    background: rgba(255,255,255,0.85);
+    border-color: rgba(255,255,255,1);
   }
