@@ -48,7 +48,8 @@
     <div class="mini-widget">
       <span class="icon">📅</span>
       <span id="date"></span>
-      <span class="divider">·</span>
+    </div>
+    <div class="mini-widget">
       <span class="icon">🕐</span>
       <span class="time" id="clock"></span>
     </div>
@@ -160,10 +161,10 @@
       // 淡出
       bgEl.style.opacity = '0';
       bgEl.style.transform = 'scale(1.05)';
-    
+      
       // 等待淡出完成
       await new Promise(resolve => setTimeout(resolve, 300));
-    
+      
       // 使用预加载的图片，如果没有就立即加载
       if (nextBg) {
         if (currentBg) URL.revokeObjectURL(currentBg);
@@ -175,16 +176,16 @@
         if (currentBg) URL.revokeObjectURL(currentBg);
         currentBg = URL.createObjectURL(blob);
       }
-    
+      
       bgEl.style.backgroundImage = `url('${currentBg}')`;
-    
-      // 预加载下一张
-      preloadBg();
-    
+      
       // 淡入
       await new Promise(resolve => setTimeout(resolve, 50));
       bgEl.style.opacity = '1';
       bgEl.style.transform = 'scale(1)';
+      
+      // 在淡入完成后预加载下一张，确保不影响当前切换
+      preloadBg();
     } catch (e) {
       console.error('Failed to load background image', e);
     }
@@ -193,10 +194,16 @@
   // 自动切换背景
   function startBgAuto() {
     clearInterval(bgInterval);
-    bgInterval = setInterval(switchBg, AUTO_INTERVAL);
+    // 使用 setTimeout 递归，确保间隔固定，避免重叠
+    function scheduleNext() {
+      bgInterval = setTimeout(() => {
+        switchBg().then(() => scheduleNext());
+      }, AUTO_INTERVAL);
+    }
+    scheduleNext();
   }
   function stopBgAuto() {
-    clearInterval(bgInterval);
+    clearTimeout(bgInterval);
     bgInterval = null;
   }
 
