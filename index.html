@@ -136,7 +136,7 @@
   let currentBg = null;
   let bgInterval = null;
   const AUTO_INTERVAL = 6000; // 6秒
-  const FIXED_BG = 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/h/真尋1184.png';
+  const FIXED_BG = 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/h/%E7%9C%9F%E5%AF%BB1184.png';
 
   async function switchBg() {
     try {
@@ -167,8 +167,8 @@
     const toggle = document.getElementById('bgToggle');
     const bgImage = document.getElementById('bgImage');
 
-    // === 主题初始化：手动优先级 > 时间自动 ===
-    const savedTheme = localStorage.getItem('theme');
+    // === 主题初始化：手动优先级 > 时间自动（会话级别）===
+    const savedTheme = sessionStorage.getItem('theme');
     if (savedTheme === 'light') {
       html.setAttribute('data-theme', 'light');
       document.getElementById('themeBtn').textContent = '☀️';
@@ -201,11 +201,11 @@
       if (html.getAttribute('data-theme') === 'light') {
         html.removeAttribute('data-theme');
         this.textContent = '🌙';
-        localStorage.setItem('theme', 'dark');
+        sessionStorage.setItem('theme', 'dark');
       } else {
         html.setAttribute('data-theme', 'light');
         this.textContent = '☀️';
-        localStorage.setItem('theme', 'light');
+        sessionStorage.setItem('theme', 'light');
       }
     });
 
