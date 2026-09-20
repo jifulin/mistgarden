@@ -140,12 +140,23 @@
 
   async function switchBg() {
     try {
+      const bgEl = document.getElementById('bgImage');
+      // 淡出
+      bgEl.style.opacity = '0';
+      bgEl.style.transform = 'scale(1.05)';
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       const resp = await fetch(BG_API);
       const blob = await resp.blob();
       const url = URL.createObjectURL(blob);
       if (currentBg) URL.revokeObjectURL(currentBg);
       currentBg = url;
-      document.getElementById('bgImage').style.backgroundImage = `url('${currentBg}')`;
+      bgEl.style.backgroundImage = `url('${currentBg}')`;
+      
+      // 淡入
+      await new Promise(resolve => setTimeout(resolve, 50));
+      bgEl.style.opacity = '1';
+      bgEl.style.transform = 'scale(1)';
     } catch (e) {
       console.error('Failed to load background image', e);
     }
