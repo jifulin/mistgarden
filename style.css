@@ -91,20 +91,22 @@ body {
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      opacity: 1;
-      transition: opacity 0.6s ease, transform 0.6s ease;
-      transform: translateX(0);
-      will-change: opacity, transform;
+      opacity: 0;                                  /* 显隐由 JS 交叉淡入淡出控制 */
+      transition: opacity 0.9s ease;
+      will-change: opacity;
+      pointer-events: none;
     }
-  .bg-image::after {
-    content: '';
-    position: absolute;
+  /* 背景之上的压暗/渐变遮罩（独立一层） */
+  .bg-overlay {
+    position: fixed;
     inset: 0;
+    z-index: 0;
+    pointer-events: none;
     background:
       radial-gradient(ellipse at top, rgba(255,255,255,0.05) 0%, transparent 55%),
       linear-gradient(180deg, var(--overlay-start) 0%, var(--overlay-end) 100%);
   }
-  
+
   /* 底部固定控件组 */
   .fixed-bottom {
     position: fixed;
@@ -298,6 +300,17 @@ body {
   .header .desc span:nth-child(5) { animation-delay: 1.2s; }
   .header .desc span:nth-child(6) { animation-delay: 1.5s; }
   .header .desc span:nth-child(7) { animation-delay: 1.8s; }
+  /* 「·收藏本页面防失联」也要和前七个字一样依次起伏，之前只写到第 7 个，
+     后面九个字全都用默认的 0s 延迟，结果整块一起上下动，看着像一坨 */
+  .header .desc span:nth-child(8) { animation-delay: 2.1s; }
+  .header .desc span:nth-child(9) { animation-delay: 2.4s; }
+  .header .desc span:nth-child(10) { animation-delay: 2.7s; }
+  .header .desc span:nth-child(11) { animation-delay: 3s; }
+  .header .desc span:nth-child(12) { animation-delay: 3.3s; }
+  .header .desc span:nth-child(13) { animation-delay: 3.6s; }
+  .header .desc span:nth-child(14) { animation-delay: 3.9s; }
+  .header .desc span:nth-child(15) { animation-delay: 4.2s; }
+  .header .desc span:nth-child(16) { animation-delay: 4.5s; }
 
   @keyframes floatUpDown {
     0%, 100% { transform: translateY(0); }

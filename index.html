@@ -11,8 +11,11 @@
 </head>
 <body>
 
-<!-- 背景图片容器 -->
+<!-- 背景图片容器：两层，交叉淡入淡出（旧图淡出、新图淡入，中间不会露出页面底色） -->
 <div class="bg-image" id="bgImage"></div>
+<div class="bg-image" id="bgImage2"></div>
+<!-- 压暗/渐变遮罩独立成层：若挂在 .bg-image 上，双层同时可见时会被叠加两次 -->
+<div class="bg-overlay"></div>
 
 <!-- 底部固定控件组 -->
 <div class="fixed-bottom">
@@ -142,6 +145,43 @@
   const AUTO_INTERVAL = 6000; // 6秒
   const FIXED_BG = 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/h/%E7%9C%9F%E5%AF%BB1184.png';
 
+  // 背景图分两层交替显示，切换时旧图淡出、新图淡入（交叉淡入淡出，不会露出页面底色）
+  const BG_LAYERS = [document.getElementById('bgImage'), document.getElementById('bgImage2')];
+  let activeLayer = 0;          // 当前显示的是哪一层
+  const FADE_MS = 900;          // 与 style.css 里 .bg-image 的 transition 保持一致
+
+  // 拉一张随机图并等到解码完成，返回 blob 地址
+  async function fetchBgBlob() {
+    const resp = await fetch(BG_API);
+    const blob = await resp.blob();
+    const imgUrl = URL.createObjectURL(blob);
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = reject;
+      img.src = imgUrl;
+    });
+    return imgUrl;
+  }
+
+  // 把 url 交叉淡入到前台；返回刚被换下去的那一层，调用方据此回收旧 blob
+  function crossFade(url) {
+    const cur = BG_LAYERS[activeLayer];
+    const nxt = BG_LAYERS[1 - activeLayer];
+    // 新图先放到隐藏层并锁死在透明状态，避免它带着上一张的过渡闪一下
+    nxt.style.transition = 'none';
+    nxt.style.opacity = '0';
+    nxt.style.backgroundImage = `url('${url}')`;
+    void nxt.offsetWidth;               // 强制重排，让上面的初始状态生效
+    nxt.style.transition = '';          // 恢复 CSS 里的过渡
+    requestAnimationFrame(() => {
+      nxt.style.opacity = '1';
+      cur.style.opacity = '0';
+    });
+    activeLayer = 1 - activeLayer;
+    return cur;
+  }
+
   // 预加载下一张背景图片
   async function preloadBg() {
     const toggle = document.getElementById('bgToggle');
@@ -151,17 +191,7 @@
       nextBg = null;
     }
     try {
-      const resp = await fetch(BG_API);
-      const blob = await resp.blob();
-      const imgUrl = URL.createObjectURL(blob);
-      // 等待图片解码完成后再使用
-      await new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve();
-        img.onerror = reject;
-        img.src = imgUrl;
-      });
-      nextBg = imgUrl;
+      nextBg = await fetchBgBlob();
     } catch (e) {
       console.error('Failed to preload background image', e);
     }
@@ -169,49 +199,32 @@
 
   async function switchBg() {
     try {
-      const bgEl = document.getElementById('bgImage');
-      let newBgUrl = null;
-      
       // 使用预加载的图片，如果没有就立即加载
-      if (nextBg) {
-        newBgUrl = nextBg;
-        nextBg = null;
-      } else {
-        // 紧急加载
-        const resp = await fetch(BG_API);
-        const blob = await resp.blob();
-        const imgUrl = URL.createObjectURL(blob);
-        // 确保图片已加载
-        await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve();
-          img.onerror = reject;
-          img.src = imgUrl;
-        });
-        newBgUrl = imgUrl;
-      }
-      
-      // 滑入效果：先移出再滑入
-      bgEl.style.opacity = '0';
-      bgEl.style.transform = 'translateX(100%)';
-      bgEl.style.backgroundImage = `url('${newBgUrl}')`;
-      // 强制重排以确保初始状态被应用
-      void bgEl.offsetWidth;
+      let newBgUrl = nextBg;
+      nextBg = null;
+      if (!newBgUrl) newBgUrl = await fetchBgBlob();
 
-      if (currentBg) URL.revokeObjectURL(currentBg);
+      const oldBg = currentBg;
       currentBg = newBgUrl;
+      crossFade(newBgUrl);
 
-      // 下一帧开始过渡，避免样式被合并
-      requestAnimationFrame(() => {
-        bgEl.style.opacity = '1';
-        bgEl.style.transform = 'translateX(0)';
-      });
-      
+      // 旧图还在淡出，等过渡结束再回收，否则可能闪一下
+      if (oldBg) setTimeout(() => URL.revokeObjectURL(oldBg), FADE_MS + 300);
+
       // 预加载下一张
       preloadBg();
     } catch (e) {
       console.error('Failed to load background image', e);
     }
+  }
+
+  // 关闭随机背景时切回固定图（同样走淡入淡出）
+  function showFixedBg() {
+    if (nextBg) { URL.revokeObjectURL(nextBg); nextBg = null; }
+    const oldBg = currentBg;
+    currentBg = null;
+    crossFade(FIXED_BG);
+    if (oldBg) setTimeout(() => URL.revokeObjectURL(oldBg), FADE_MS + 300);
   }
 
   // 自动切换背景
@@ -234,7 +247,6 @@
   (function() {
     const html = document.documentElement;
     const toggle = document.getElementById('bgToggle');
-    const bgImage = document.getElementById('bgImage');
 
     // === 主题初始化：手动优先级 > 时间自动（会话级别）===
     const savedTheme = sessionStorage.getItem('theme');
@@ -258,7 +270,7 @@
     if (autoBg === 'off') {
       toggle.checked = false;
       stopBgAuto();
-      bgImage.style.backgroundImage = `url('${FIXED_BG}')`;
+      showFixedBg();
     } else {
       toggle.checked = true;
       // 先预加载，再切换
@@ -288,10 +300,8 @@
       } else {
         stopBgAuto();
         sessionStorage.setItem('autoBg', 'off');
-        bgImage.style.backgroundImage = `url('${FIXED_BG}')`;
-        // 清理预加载，避免关闭后仍请求 API
-        if (nextBg) { URL.revokeObjectURL(nextBg); nextBg = null; }
-        if (currentBg) { URL.revokeObjectURL(currentBg); currentBg = null; }
+        // 切回固定图（淡入淡出），并清理预加载，避免关闭后仍请求 API
+        showFixedBg();
       }
     });
   })();
