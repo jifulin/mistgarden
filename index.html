@@ -458,6 +458,18 @@
     });
   }
 </script>
+<!-- 自动播放询问弹窗：浏览器禁止网页自动出声，需要用户点一下才能起播 -->
+<div class="play-ask" id="playAsk" hidden>
+  <div class="play-ask-card">
+    <div class="play-ask-icon">🎵</div>
+    <div class="play-ask-title">要播放背景音乐吗？</div>
+    <div class="play-ask-desc">浏览器不允许自动出声，点「播放」就能开始</div>
+    <div class="play-ask-btns">
+      <button class="play-ask-btn primary" id="playAskYes" type="button">🔊 播放</button>
+      <button class="play-ask-btn" id="playAskNo" type="button">🔇 关闭</button>
+    </div>
+  </div>
+</div>
 <!-- 音乐播放器 左下角（本地音源，不使用 CDN） -->
 <!-- 外层 .music-player 负责 fixed 定位，内层 #musicPlayer 才是 APlayer 的容器：
      若把 id 直接放在外层，APlayer 会给它加上 .aplayer 类，而后加载的 APlayer.min.css
