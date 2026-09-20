@@ -151,7 +151,15 @@
     try {
       const resp = await fetch(BG_API);
       const blob = await resp.blob();
-      nextBg = URL.createObjectURL(blob);
+      const imgUrl = URL.createObjectURL(blob);
+      // 等待图片解码完成后再使用
+      await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = imgUrl;
+      });
+      nextBg = imgUrl;
     } catch (e) {
       console.error('Failed to preload background image', e);
     }
@@ -160,33 +168,44 @@
   async function switchBg() {
     try {
       const bgEl = document.getElementById('bgImage');
-      // 淡出
-      bgEl.style.opacity = '0';
-      bgEl.style.transform = 'scale(1.05)';
-      
-      // 等待淡出完成
-      await new Promise(resolve => setTimeout(resolve, 300));
+      let newBgUrl = null;
       
       // 使用预加载的图片，如果没有就立即加载
       if (nextBg) {
-        if (currentBg) URL.revokeObjectURL(currentBg);
-        currentBg = nextBg;
+        newBgUrl = nextBg;
         nextBg = null;
       } else {
+        // 紧急加载
         const resp = await fetch(BG_API);
         const blob = await resp.blob();
-        if (currentBg) URL.revokeObjectURL(currentBg);
-        currentBg = URL.createObjectURL(blob);
+        const imgUrl = URL.createObjectURL(blob);
+        // 确保图片已加载
+        await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve();
+          img.onerror = reject;
+          img.src = imgUrl;
+        });
+        newBgUrl = imgUrl;
       }
       
-      bgEl.style.backgroundImage = `url('${currentBg}')`;
+      // 先设置新背景（在淡出前），避免白屏
+      bgEl.style.backgroundImage = `url('${newBgUrl}')`;
       
-      // 淡入
+      // 开始淡出淡入
+      bgEl.style.opacity = '0';
+      bgEl.style.transform = 'scale(1.05)';
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      if (currentBg) URL.revokeObjectURL(currentBg);
+      currentBg = newBgUrl;
+      
       await new Promise(resolve => setTimeout(resolve, 50));
       bgEl.style.opacity = '1';
       bgEl.style.transform = 'scale(1)';
       
-      // 在淡入完成后预加载下一张，确保不影响当前切换
+      // 预加载下一张
       preloadBg();
     } catch (e) {
       console.error('Failed to load background image', e);
