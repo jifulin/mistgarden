@@ -458,9 +458,34 @@
     });
   }
 </script>
-<!-- 网易云音乐播放器 左下角 -->
+<!-- 音乐播放器 左下角（本地音源，不使用 CDN） -->
+<!-- 外层 .music-player 负责 fixed 定位，内层 #musicPlayer 才是 APlayer 的容器：
+     若把 id 直接放在外层，APlayer 会给它加上 .aplayer 类，而后加载的 APlayer.min.css
+     里的 .aplayer{position:relative} 会盖掉 .music-player 的 fixed，播放器就掉到页面底部了 -->
 <div class="music-player">
-  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="https://music.163.com/outchain/player?type=0&id=YOUR_PLAYLIST_ID&auto=1&height=66"></iframe>
+  <div id="musicPlayer">🎵 加载中…</div>
 </div>
+<link rel="stylesheet" href="assets/APlayer.min.css">
+<style>
+  .aplayer .aplayer-info {
+    height: auto !important;
+    min-height: 66px !important;
+  }
+  .aplayer .aplayer-info .aplayer-music {
+    overflow: visible !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+    height: auto !important;
+    line-height: 1.5 !important;
+    margin-bottom: 8px !important;
+  }
+  .aplayer .aplayer-info .aplayer-music .aplayer-title,
+  .aplayer .aplayer-info .aplayer-music .aplayer-author {
+    white-space: normal !important;
+    display: inline !important;
+  }
+</style>
+<script src="assets/APlayer.min.js"></script>
+<script src="assets/player.js"></script>
 </body>
 </html>

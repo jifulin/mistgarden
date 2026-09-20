@@ -431,9 +431,9 @@ body {
   .link-card .card-desc {
     font-size: 12px;
     color: var(--text-muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.5;
+    white-space: normal;
+    word-break: break-word;
   }
   .link-card .arrow {
     color: var(--arrow-color);
@@ -729,7 +729,15 @@ body {
     border-radius: 12px;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    padding: 6px;
+    padding: 3px;
     box-shadow: 0 4px 16px var(--shadow);
+    width: 280px;
+  }
+  /* 歌词背景透明 */
+  .aplayer .aplayer-lrc {
+    background: transparent !important;
+  }
+  .aplayer .aplayer-lrc .aplayer-lrc-contents {
+    background: transparent !important;
   }
 
