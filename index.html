@@ -6,7 +6,10 @@
 <title>雾光庭院</title>
 <link rel="icon" type="image/png" href="https://p.qlogo.cn/gh/741215938/741215938/640">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<!-- 资源版本号：改完 style.css / player.js / live2d.js 记得把下面几处的 ?v= 一起改
+     （站点走 Cloudflare，CSS/JS 边缘缓存 4 小时；不换版本号的话会出现「新 HTML + 旧 CSS」，
+      看板娘容器拿不到 position:fixed，整页被顶下去一大块） -->
+<link rel="stylesheet" href="style.css?v=20260920b">
 
 </head>
 <body>
@@ -692,7 +695,7 @@
 <!-- 手机端专用：左下角展开/收回播放器的小按钮，可拖动、拖到边上会缩小吸边（桌面端由 CSS 隐藏）。
      初始 class 就是「收起」，免得手机端加载时闪一下展开的播放器；桌面端 .is-collapsed 没有样式，等于没加 -->
 <button class="music-toggle" id="musicToggle" type="button" aria-expanded="false" aria-controls="musicPlayer" title="展开播放器">🎵</button>
-<link rel="stylesheet" href="assets/APlayer.min.css">
+<link rel="stylesheet" href="assets/APlayer.min.css?v=20260920b">
 <style>
   .aplayer .aplayer-info {
     height: auto !important;
@@ -712,8 +715,8 @@
     display: inline !important;
   }
 </style>
-<script src="assets/APlayer.min.js"></script>
-<script src="assets/player.js"></script>
-<script src="assets/live2d.js"></script>
+<script src="assets/APlayer.min.js?v=20260920b"></script>
+<script src="assets/player.js?v=20260920b"></script>
+<script src="assets/live2d.js?v=20260920b"></script>
 </body>
 </html>
