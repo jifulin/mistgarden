@@ -9,7 +9,7 @@
 <!-- 资源版本号：改完 style.css / player.js / live2d.js 记得把下面几处的 ?v= 一起改
      （站点走 Cloudflare，CSS/JS 边缘缓存 4 小时；不换版本号的话会出现「新 HTML + 旧 CSS」，
       看板娘容器拿不到 position:fixed，整页被顶下去一大块） -->
-<link rel="stylesheet" href="style.css?v=20260920b">
+<link rel="stylesheet" href="style.css?v=20260920c">
 
 </head>
 <body>
@@ -151,6 +151,10 @@
 <script>
   // 背景图片配置（使用API获取随机横图）
   const BG_API = 'https://api.lqay.cn/api/zxsjt/?cat=heng';
+  // 手机端用竖图接口（1242×1815 这类竖构图）。注意：这个接口的跳转目标不带 CORS 头，
+  // 只能当普通图片用（background-image / <img>），fetch 成 blob 会被浏览器拦掉
+  const BG_API_MOBILE = 'https://img.paulzzh.com/touhou/random?size=wap';
+  const NARROW_MQ = window.matchMedia('(max-width: 640px)');
   let currentBg = null;
   let nextBg = null;
   let bgInterval = null;
@@ -162,8 +166,20 @@
   let activeLayer = 0;          // 当前显示的是哪一层
   const FADE_MS = 900;          // 与 style.css 里 .bg-image 的 transition 保持一致
 
-  // 拉一张随机图并等到解码完成，返回 blob 地址
+  // 拉一张随机图并等到解码完成，返回可用作背景的地址
   async function fetchBgBlob() {
+    // 手机端：接口没有 CORS 头，走不了 fetch，直接把 URL 交给 background-image。
+    // 带个随机参数，否则浏览器可能把 302 缓存住、一直返回同一张
+    if (NARROW_MQ.matches) {
+      const url = BG_API_MOBILE + '&r=' + Date.now() + Math.random().toString(36).slice(2, 6);
+      await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = url;
+      });
+      return url;
+    }
     const resp = await fetch(BG_API);
     const blob = await resp.blob();
     const imgUrl = URL.createObjectURL(blob);
@@ -352,11 +368,20 @@
         if (lift <= window.innerHeight - 8) bar.style.bottom = lift + 'px';   // 抬起来也得留在屏幕里
       }
     }
-    if (window.ResizeObserver) new ResizeObserver(sync).observe(player);
-    window.addEventListener('resize', function () { clampBtn(); sync(); });
+    /* --- 桌面端：手柄高度跟着播放器走（展开歌单/歌词变高时也保持一致） --- */
+    function syncHandle() {
+      if (!btn) return;
+      if (mq.matches) { btn.style.height = ''; return; }     // 手机端是 44×44，交回 CSS
+      const h = player.offsetHeight;
+      if (h) btn.style.height = h + 'px';
+    }
+
+    if (window.ResizeObserver) new ResizeObserver(function () { sync(); syncHandle(); }).observe(player);
+    window.addEventListener('resize', function () { clampBtn(); sync(); syncHandle(); });
     sync();
+    syncHandle();
     // 播放器内容是异步出来的（歌单、歌词、字体），补校准几次
-    [400, 1500, 3000].forEach(function (t) { setTimeout(sync, t); });
+    [400, 1500, 3000].forEach(function (t) { setTimeout(function () { sync(); syncHandle(); }, t); });
 
     if (!btn) return;
 
@@ -365,13 +390,34 @@
       open = next;
       player.classList.toggle('is-collapsed', !open);
       player.classList.toggle('is-right', side === 'right');
-      btn.textContent = open ? '✕' : '🎵';
+      btn.textContent = open ? (mq.matches ? '✕' : '«') : '🎵';   // 桌面端拉开时显示「收回」箭头
       btn.title = open ? '收起播放器' : '展开播放器';
       btn.setAttribute('aria-expanded', String(open));
+      // 桌面端：手柄跟着抽屉一起被推出去（手机端手柄是独立的浮动按钮，不动）
+      btn.classList.toggle('is-drawer-open', open && !mq.matches);
       if (open) placePlayer();
       sync();
+      if (open) armIdle(); else keepOpen();
     }
-    apply(!mq.matches);                            // 桌面端恒为展开
+
+    /* --- 桌面端抽屉：闲置（鼠标也不在上面）就自动收回贴边，点左边手柄再滑出 --- */
+    const IDLE_MS = 8000;                  // 多久没操作就收回去
+    let idleTimer = null;
+    let hovering = false;
+    function keepOpen() { clearTimeout(idleTimer); idleTimer = null; }
+    function armIdle() {
+      keepOpen();
+      if (mq.matches || !open || hovering) return;   // 手机端不自动收；鼠标停在播放器上也不收
+      idleTimer = setTimeout(function () { if (!mq.matches && !hovering && open) apply(false); }, IDLE_MS);
+    }
+    player.addEventListener('mouseenter', function () { hovering = true; keepOpen(); });
+    player.addEventListener('mouseleave', function () { hovering = false; armIdle(); });
+    player.addEventListener('mousemove', keepOpen);        // 动一下（拖进度条、翻歌单）就重新计时
+    player.addEventListener('click', armIdle);
+    btn.addEventListener('mouseenter', function () { if (!mq.matches) armIdle(); });
+
+    player.classList.toggle('is-drawer', !mq.matches);     // 抽屉的收起样式只在桌面端生效
+    apply(!mq.matches);                            // 桌面端先展开（随后闲置自动收回），手机端默认收起
     btn.addEventListener('click', function () {
       if (suppressClick) { suppressClick = false; return; }
       apply(!open);
@@ -494,7 +540,10 @@
     // 窗口从桌面缩到手机宽度（或反过来）时，跟着切到对应的默认状态
     function onMq() {
       if (!mq.matches) clearPlayerStyle();      // 回桌面端：位置交回 CSS，别留内联样式
+      player.classList.toggle('is-drawer', !mq.matches);
       apply(!mq.matches);
+      syncHandle();
+      armIdle();
     }
     if (mq.addEventListener) mq.addEventListener('change', onMq);
     else if (mq.addListener) mq.addListener(onMq);
@@ -695,7 +744,7 @@
 <!-- 手机端专用：左下角展开/收回播放器的小按钮，可拖动、拖到边上会缩小吸边（桌面端由 CSS 隐藏）。
      初始 class 就是「收起」，免得手机端加载时闪一下展开的播放器；桌面端 .is-collapsed 没有样式，等于没加 -->
 <button class="music-toggle" id="musicToggle" type="button" aria-expanded="false" aria-controls="musicPlayer" title="展开播放器">🎵</button>
-<link rel="stylesheet" href="assets/APlayer.min.css?v=20260920b">
+<link rel="stylesheet" href="assets/APlayer.min.css?v=20260920c">
 <style>
   .aplayer .aplayer-info {
     height: auto !important;
@@ -715,8 +764,8 @@
     display: inline !important;
   }
 </style>
-<script src="assets/APlayer.min.js?v=20260920b"></script>
-<script src="assets/player.js?v=20260920b"></script>
-<script src="assets/live2d.js?v=20260920b"></script>
+<script src="assets/APlayer.min.js?v=20260920c"></script>
+<script src="assets/player.js?v=20260920c"></script>
+<script src="assets/live2d.js?v=20260920c"></script>
 </body>
 </html>
