@@ -185,7 +185,7 @@
     }
 
     // === 背景自动切换初始化 ===
-    const autoBg = localStorage.getItem('autoBg');
+    const autoBg = sessionStorage.getItem('autoBg');
     if (autoBg === 'off') {
       toggle.checked = false;
       stopBgAuto();
@@ -214,10 +214,10 @@
       if (this.checked) {
         switchBg();
         startBgAuto();
-        localStorage.setItem('autoBg', 'on');
+        sessionStorage.setItem('autoBg', 'on');
       } else {
         stopBgAuto();
-        localStorage.setItem('autoBg', 'off');
+        sessionStorage.setItem('autoBg', 'off');
         bgImage.style.backgroundImage = `url('${FIXED_BG}')`;
       }
     });
