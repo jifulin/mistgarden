@@ -17,6 +17,12 @@
 <!-- 压暗/渐变遮罩独立成层：若挂在 .bg-image 上，双层同时可见时会被叠加两次 -->
 <div class="bg-overlay"></div>
 
+<!-- Live2D 看板娘：整块 pointer-events:none，纯装饰，不会挡住页面点击 -->
+<div class="live2d-wrap" id="live2dWrap" hidden>
+  <div class="live2d-tip" id="live2dTip" hidden></div>
+  <canvas class="live2d-canvas" id="live2dCanvas"></canvas>
+</div>
+
 <!-- 底部固定控件组 -->
 <div class="fixed-bottom">
   <!-- 背景自动切换开关 -->
@@ -29,6 +35,9 @@
   </div>
   <!-- 主题切换 -->
   <button onclick="toggleTheme()" id="themeBtn">🌙</button>
+  <!-- Live2D 看板娘：显示/隐藏；models.json 里有多个模型时才会出现切换按钮 -->
+  <button id="live2dBtn" type="button" title="显示看板娘">🎀</button>
+  <button id="live2dSwitch" type="button" title="切换模型" hidden>🔄</button>
 </div>
 
 <div class="container">
@@ -306,6 +315,199 @@
     });
   })();
 
+  // === 手机端底部布局：播放器收成左下角小按钮 + 底部控件组让位 ===
+  // 播放器高度会随歌词/歌单展开而变化，所以用 ResizeObserver 实时贴在它上方
+  // 注意：这段内联脚本在 .music-player（页面后半部分）之前执行，必须等 DOM 就绪
+  function setupMobileBottomUI() {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const player = document.querySelector('.music-player');
+    const bar = document.querySelector('.fixed-bottom');
+    const btn = document.getElementById('musicToggle');
+    if (!player || !bar) return;
+
+    const BTN      = 44;      // 按钮的布局尺寸（固定；贴边靠 transform 缩小，命中区不缩水）
+    const DOCK_GAP = 2;       // 贴边后离屏幕边缘几像素
+    const DOCK_IN  = 14;      // 离边 ≤14px 判定为贴边
+    const DOCK_OUT = 28;      // 拉开 >28px 才脱离（滞回，免得在阈值上来回抖）
+    const clamp = function (v, min, max) { return Math.min(Math.max(v, min), max); };
+    let pos = null;                        // 按钮布局左上角（视口坐标）
+    let dock = { x: null, y: null };        // 当前贴住哪几条边
+    let open = true;
+    let side = 'left';                     // 展开时播放器贴哪边，跟着按钮走
+    let suppressClick = false;             // 刚拖完那一下不算点击
+    let drag = null;
+
+    /* --- 底部控件组：只在真被播放器压住时才抬起来；收起或桌面端用回 CSS 的 bottom: 20px --- */
+    function sync() {
+      if (!mq.matches || player.classList.contains('is-collapsed')) { bar.style.bottom = ''; return; }
+      placePlayer();                               // 播放器跟着按钮走，位置每次现算
+      bar.style.bottom = '';                       // 先归位再量，否则会拿上一次的抬高值自我反馈
+      const p = player.getBoundingClientRect();
+      const b = bar.getBoundingClientRect();
+      if (p.left < b.right && b.left < p.right && p.top < b.bottom && b.top < p.bottom) {
+        const lift = Math.round(window.innerHeight - p.top + 8);
+        if (lift <= window.innerHeight - 8) bar.style.bottom = lift + 'px';   // 抬起来也得留在屏幕里
+      }
+    }
+    if (window.ResizeObserver) new ResizeObserver(sync).observe(player);
+    window.addEventListener('resize', function () { clampBtn(); sync(); });
+    sync();
+    // 播放器内容是异步出来的（歌单、歌词、字体），补校准几次
+    [400, 1500, 3000].forEach(function (t) { setTimeout(sync, t); });
+
+    if (!btn) return;
+
+    /* --- 展开/收回：手机默认收起，不挡页脚 --- */
+    function apply(next) {
+      open = next;
+      player.classList.toggle('is-collapsed', !open);
+      player.classList.toggle('is-right', side === 'right');
+      btn.textContent = open ? '✕' : '🎵';
+      btn.title = open ? '收起播放器' : '展开播放器';
+      btn.setAttribute('aria-expanded', String(open));
+      if (open) placePlayer();
+      sync();
+    }
+    apply(!mq.matches);                            // 桌面端恒为展开
+    btn.addEventListener('click', function () {
+      if (suppressClick) { suppressClick = false; return; }
+      apply(!open);
+    });
+
+    /* --- 播放器跟着按钮走：放按钮下方，下方放不下就放上方，横向占满 --- */
+    function placePlayer() {
+      if (!mq.matches || !pos) return;
+      const h = player.offsetHeight || 131;
+      const gap = 6;
+      player.style.left = '10px';
+      player.style.right = '10px';
+      player.style.bottom = 'auto';
+      player.style.top = (pos.y + BTN + gap + h <= window.innerHeight - 8)
+        ? Math.round(pos.y + BTN + gap) + 'px'                  // 按钮下面放得下
+        : Math.round(Math.max(8, pos.y - gap - h)) + 'px';      // 否则放到按钮上面
+    }
+    function clearPlayerStyle() {
+      player.style.left = player.style.right = player.style.top = player.style.bottom = '';
+    }
+
+    /* --- 按钮可拖动：手机上未必有“刚好不挡东西”的位置，让用户自己挪（位置记在 localStorage）--- */
+    const POS_KEY = 'mistgarden-music-btn';
+
+    function readPos() {
+      try {
+        const v = localStorage.getItem(POS_KEY);
+        if (!v) return null;
+        const a = v.split(',');
+        const x = parseFloat(a[0]), y = parseFloat(a[1]);
+        return isFinite(x) && isFinite(y) ? { x: x, y: y } : null;
+      } catch (e) { return null; }
+    }
+
+    // 按 pos 写样式：靠边就吸到边上并缩小（滞回，免得在阈值上来回抖）
+    function layoutButton(remember) {
+      if (!mq.matches) return;
+      const nearX = pos.x <= DOCK_IN ? 'left'
+                  : pos.x + BTN >= window.innerWidth - DOCK_IN ? 'right' : null;
+      const nearY = pos.y <= DOCK_IN ? 'top'
+                  : pos.y + BTN >= window.innerHeight - DOCK_IN ? 'bottom' : null;
+      if (dock.x === 'left'   && pos.x > DOCK_OUT) dock.x = null;
+      if (dock.x === 'right'  && pos.x + BTN < window.innerWidth - DOCK_OUT) dock.x = null;
+      if (dock.y === 'top'    && pos.y > DOCK_OUT) dock.y = null;
+      if (dock.y === 'bottom' && pos.y + BTN < window.innerHeight - DOCK_OUT) dock.y = null;
+      if (nearX) dock.x = nearX;
+      if (nearY) dock.y = nearY;
+
+      let x = pos.x, y = pos.y;
+      if (dock.x === 'left')   x = DOCK_GAP;
+      if (dock.x === 'right')  x = window.innerWidth - BTN - DOCK_GAP;
+      if (dock.y === 'top')    y = DOCK_GAP;
+      if (dock.y === 'bottom') y = window.innerHeight - BTN - DOCK_GAP;
+      pos = { x: x, y: y };
+
+      btn.style.left = Math.round(x) + 'px';
+      btn.style.top = Math.round(y) + 'px';
+      btn.style.bottom = 'auto';
+      // 缩小的方向朝着贴着的那条边，看起来就是“缩到边上”
+      btn.classList.toggle('is-docked', !!(dock.x || dock.y));
+      btn.style.transformOrigin =
+        (dock.x === 'right' ? 'right' : dock.x === 'left' ? 'left' : 'center') + ' ' +
+        (dock.y === 'bottom' ? 'bottom' : dock.y === 'top' ? 'top' : 'center');
+
+      side = (x + BTN / 2 > window.innerWidth / 2) ? 'right' : 'left';
+      player.classList.toggle('is-right', side === 'right');
+      if (open) placePlayer();
+      if (remember) { try { localStorage.setItem(POS_KEY, Math.round(x) + ',' + Math.round(y)); } catch (e) {} }
+    }
+
+    function place(x, y, remember) {
+      if (!mq.matches) return;
+      pos = { x: clamp(x, 0, window.innerWidth - BTN), y: clamp(y, 0, window.innerHeight - BTN) };
+      layoutButton(remember);
+    }
+    // 屏幕旋转/缩放后把按钮拉回可视区
+    function clampBtn() {
+      if (!mq.matches || !pos) return;
+      place(pos.x, pos.y, true);
+    }
+
+    const saved = readPos();
+    if (saved && mq.matches) place(saved.x, saved.y, false);
+
+    btn.addEventListener('pointerdown', function (e) {
+      if (!mq.matches || e.button > 0) return;
+      // 必须拦默认行为：不拦的话浏览器会启动原生拖拽/选择，pointer 立刻被 cancel，拖动只跟一帧
+      if (e.cancelable) e.preventDefault();
+      if (!pos) { const r = btn.getBoundingClientRect(); pos = { x: r.left, y: r.top }; }
+      drag = { id: e.pointerId, dx: e.clientX - pos.x, dy: e.clientY - pos.y,
+               x0: e.clientX, y0: e.clientY, moved: false };
+      if (btn.setPointerCapture) btn.setPointerCapture(e.pointerId);
+    });
+    btn.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      // 移动不超过 6px 当点击，避免手抖就把按钮挪走
+      if (!drag.moved && Math.abs(e.clientX - drag.x0) + Math.abs(e.clientY - drag.y0) < 6) return;
+      drag.moved = true;
+      btn.classList.add('is-dragging');
+      place(e.clientX - drag.dx, e.clientY - drag.dy, false);
+    });
+    function endDrag(e, cancelled) {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      const moved = drag.moved;
+      drag = null;
+      btn.classList.remove('is-dragging');
+      if (moved) layoutButton(true);                       // 松手再存一次位置（贴边后的最终位置）
+      // 没拖动就是点了一下 = 开关。不用等 click：pointerdown 拦了默认行为后 click 不一定派发
+      if (!moved && !cancelled) apply(!open);
+      suppressClick = true;                                // 真来了 click 也别再切一次
+      setTimeout(function () { suppressClick = false; }, 350);
+    }
+    btn.addEventListener('pointerup', function (e) { endDrag(e, false); });
+    btn.addEventListener('pointercancel', function (e) { endDrag(e, true); });
+
+    // 在询问框里选了「播放」= 现在就想听，顺手把播放器展开
+    const yes = document.getElementById('playAskYes');
+    if (yes) yes.addEventListener('click', function () { if (mq.matches) apply(true); });
+
+    // 窗口从桌面缩到手机宽度（或反过来）时，跟着切到对应的默认状态
+    function onMq() {
+      if (!mq.matches) clearPlayerStyle();      // 回桌面端：位置交回 CSS，别留内联样式
+      apply(!mq.matches);
+    }
+    if (mq.addEventListener) mq.addEventListener('change', onMq);
+    else if (mq.addListener) mq.addListener(onMq);
+
+    // 收起状态下音乐还在放：按钮呼吸提示（APlayer 的 audio 元素是异步建出来的，找不到就重试）
+    (function watchAudio(tries) {
+      const au = player.querySelector('audio');
+      if (!au) { if (tries < 25) setTimeout(function () { watchAudio(tries + 1); }, 400); return; }
+      const mark = function () { btn.classList.toggle('is-playing', !au.paused); };
+      ['play', 'pause', 'ended'].forEach(function (e) { au.addEventListener(e, mark); });
+      mark();
+    })(0);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupMobileBottomUI);
+  else setupMobileBottomUI();
+
   // === 页面运行时功能 ===
   function updateClock() {
     const now = new Date();
@@ -484,9 +686,12 @@
 <!-- 外层 .music-player 负责 fixed 定位，内层 #musicPlayer 才是 APlayer 的容器：
      若把 id 直接放在外层，APlayer 会给它加上 .aplayer 类，而后加载的 APlayer.min.css
      里的 .aplayer{position:relative} 会盖掉 .music-player 的 fixed，播放器就掉到页面底部了 -->
-<div class="music-player">
+<div class="music-player is-collapsed">
   <div id="musicPlayer">🎵 加载中…</div>
 </div>
+<!-- 手机端专用：左下角展开/收回播放器的小按钮，可拖动、拖到边上会缩小吸边（桌面端由 CSS 隐藏）。
+     初始 class 就是「收起」，免得手机端加载时闪一下展开的播放器；桌面端 .is-collapsed 没有样式，等于没加 -->
+<button class="music-toggle" id="musicToggle" type="button" aria-expanded="false" aria-controls="musicPlayer" title="展开播放器">🎵</button>
 <link rel="stylesheet" href="assets/APlayer.min.css">
 <style>
   .aplayer .aplayer-info {
@@ -509,5 +714,6 @@
 </style>
 <script src="assets/APlayer.min.js"></script>
 <script src="assets/player.js"></script>
+<script src="assets/live2d.js"></script>
 </body>
 </html>

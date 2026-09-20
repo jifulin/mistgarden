@@ -758,6 +758,45 @@ body {
     background: transparent !important;
   }
 
+  /* === Live2D 看板娘（右下角，纯装饰） === */
+  .live2d-wrap {
+    position: fixed;
+    right: 0;
+    bottom: 64px;                     /* 抬到底部控件条上方，免得控件压在模型上 */
+    z-index: 5;                       /* 低于 .fixed-bottom(10)，控件浮在模型上面 */
+    width: min(40vw, 340px);
+    height: min(52vh, 480px);
+    pointer-events: none;             /* 不挡页面点击，也不做命中交互 */
+  }
+  .live2d-wrap[hidden] { display: none; }
+  .live2d-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .live2d-tip {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--btn-text);
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .live2d-tip[hidden] { display: none; }
+  /* 看板娘关掉时按钮变淡，一眼能看出状态 */
+  .fixed-bottom button.is-off { opacity: 0.5; }
+  /* 手机上不加载看板娘（省流量，也不跟播放器挤），相关按钮一并藏掉 */
+  @media (max-width: 640px) {
+    .live2d-wrap { display: none; }
+    .fixed-bottom #live2dBtn,
+    .fixed-bottom #live2dSwitch { display: none; }
+  }
+
   /* === 自动播放询问弹窗（云母质感，跟随主题） === */
   .play-ask {
     position: fixed;
@@ -857,5 +896,66 @@ body {
   [data-theme="light"] .play-ask-btn.primary:hover { background: linear-gradient(135deg, #f8739a 0%, #e04a7b 100%); }
   @media (max-width: 640px) {
     .play-ask-card { width: 100%; padding: 22px 18px 18px; }
+  }
+
+  /* === 手机端播放器：默认收在左下角一个小按钮里，点开才展开（免得挡住页脚） ===
+     展开时占满底部（左边给小按钮让位），底部控件组由 JS 实时抬到它上方 */
+  .music-toggle { display: none; }
+  /* 收起状态下音乐还在放：按钮轻轻呼吸，免得以为没在响 */
+  @keyframes musicBreath {
+    0%, 100% { transform: scale(1);    box-shadow: 0 4px 16px var(--shadow); }
+    50%      { transform: scale(1.07); box-shadow: 0 6px 20px var(--accent2); }
+  }
+
+  @media (max-width: 640px) {
+    .music-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      left: 10px;
+      bottom: 10px;
+      z-index: 11;                     /* 盖在播放器(10)上面 */
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      font-size: 19px;
+      line-height: 1;
+      color: var(--btn-text);
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 14px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 16px var(--shadow);
+      cursor: pointer;
+      touch-action: none;              /* 手机上拖按钮别连带滚页面 */
+      user-select: none;
+      -webkit-user-select: none;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .music-toggle:active { transform: scale(0.92); }
+    .music-toggle.is-dragging { transform: scale(1.08); }
+    /* 拖到屏幕边上：缩小、贴着边站（缩小方向由 JS 设的 transform-origin 决定） */
+    .music-toggle.is-docked { transform: scale(0.78); }
+    .music-toggle.is-playing { animation: musicBreath 1.8s ease-in-out infinite; }
+
+    .music-player {
+      left: 62px;                      /* 给左下角的小按钮让位 */
+      right: 10px;
+      bottom: 10px;
+      width: auto;
+      transition: transform 0.34s cubic-bezier(.4, 0, .2, 1), opacity 0.26s ease;
+    }
+    /* 按钮被拖到屏幕右半边时，播放器也跟着贴右边 */
+    .music-player.is-right { left: 10px; right: 62px; }
+    /* 收回：整块滑到屏幕外面，但保留布局尺寸（APlayer 内部量到 0 尺寸会乱） */
+    .music-player.is-collapsed {
+      transform: translateX(calc(-100% - 80px));
+      opacity: 0;
+      pointer-events: none;
+    }
+    .music-player.is-collapsed.is-right { transform: translateX(calc(100% + 80px)); }
+    .fixed-bottom { right: 12px; }
   }
 
