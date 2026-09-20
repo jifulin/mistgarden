@@ -35,7 +35,9 @@
       <img class="avatar" src="https://p.qlogo.cn/gh/741215938/741215938/640" alt="">
     </div>
     <h1>雾光庭院</h1>
-    <p class="desc">雾光庭院引导页</p>
+    <p class="desc">
+      <span>雾</span><span>光</span><span>庭</span><span>院</span><span>引</span><span>导</span><span>页</span><span>·</span><span>收</span><span>藏</span><span>本</span><span>页</span><span>面</span><span>防</span><span>失</span><span>联</span>
+    </p>
   </div>
 
   <!-- 一言 -->
@@ -297,6 +299,14 @@
       const el = document.getElementById('hitokoto');
       el.textContent = data.hitokoto;
       if (data.from) el.title = `——《${data.from}》`;
+      // 白天模式一言两种可读配色
+      if (document.documentElement.getAttribute('data-theme') === 'light') {
+        if (Math.random() < 0.5) {
+          el.classList.add('hitokoto-alt');
+        } else {
+          el.classList.remove('hitokoto-alt');
+        }
+      }
     } catch (e) {
       document.getElementById('hitokoto').textContent = '点击获取一句话';
     }

@@ -1,5 +1,19 @@
 
-  :root {
+  /* 字体设置 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+@font-face {
+  font-family: 'Sarasa Gothic';
+  src: url('https://cdn.jsdelivr.net/gh/be5invis/Sarasa-Gothic@master/SarasaGothicSC-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Sarasa Gothic', 'Noto Sans SC', sans-serif;
+}
+
+:root {
     /* 夜间模式变量 */
     --card: rgba(10,10,15,0.55);
     --card-hover: rgba(10,10,15,0.75);
@@ -264,6 +278,29 @@
     background-clip: text;
     font-size: 14px;
     font-weight: 300;
+    display: inline-block;
+  }
+
+  .header .desc span {
+    display: inline-block;
+    color: transparent;
+    background: linear-gradient(135deg, #FFF8DC 0%, #FAF0E6 30%, #FFB6C1 70%, #FF69B4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: floatUpDown 3s ease-in-out infinite;
+  }
+
+  .header .desc span:nth-child(1) { animation-delay: 0s; }
+  .header .desc span:nth-child(2) { animation-delay: 0.3s; }
+  .header .desc span:nth-child(3) { animation-delay: 0.6s; }
+  .header .desc span:nth-child(4) { animation-delay: 0.9s; }
+  .header .desc span:nth-child(5) { animation-delay: 1.2s; }
+  .header .desc span:nth-child(6) { animation-delay: 1.5s; }
+  .header .desc span:nth-child(7) { animation-delay: 1.8s; }
+
+  @keyframes floatUpDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
   }
   
   /* === 时间/天气小组件 === */
@@ -435,6 +472,40 @@
   .hitokoto:hover {
     background: var(--tab-hover);
     filter: brightness(1.1);
+  }
+  /* 白天模式一言可读性优化：渐变色，两种配色不重复 */
+  [data-theme="light"] .hitokoto {
+    color: transparent;
+    background: linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  [data-theme="light"] .hitokoto.hitokoto-alt {
+    background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+  }
+  /* 白天模式标题与副标题：主标题真寻奶黄粉少女+3D阴影，副标题深色渐变 */
+  [data-theme="light"] .header h1 {
+    background: linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 35%, #FFB6C1 70%, #FF69B4 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    text-shadow: 1px 1px 0 #fff, 2px 2px 0 rgba(255,240,245,0.9), 3px 3px 0 rgba(255,228,225,0.8), 4px 4px 6px rgba(0,0,0,0.12);
+    filter: none;
+  }
+  [data-theme="light"] .header .desc {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+  }
+  [data-theme="light"] .header .desc span {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
   }
 
   /* === 联系区 === */
