@@ -134,9 +134,25 @@
   // 背景图片配置（使用API获取随机横图）
   const BG_API = 'https://api.lqay.cn/api/zxsjt/?cat=heng';
   let currentBg = null;
+  let nextBg = null;
   let bgInterval = null;
   const AUTO_INTERVAL = 6000; // 6秒
   const FIXED_BG = 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/h/%E7%9C%9F%E5%AF%BB1184.png';
+
+  // 预加载下一张背景图片
+  async function preloadBg() {
+    if (nextBg) {
+      URL.revokeObjectURL(nextBg);
+      nextBg = null;
+    }
+    try {
+      const resp = await fetch(BG_API);
+      const blob = await resp.blob();
+      nextBg = URL.createObjectURL(blob);
+    } catch (e) {
+      console.error('Failed to preload background image', e);
+    }
+  }
 
   async function switchBg() {
     try {
@@ -144,15 +160,27 @@
       // 淡出
       bgEl.style.opacity = '0';
       bgEl.style.transform = 'scale(1.05)';
+    
+      // 等待淡出完成
       await new Promise(resolve => setTimeout(resolve, 300));
-      
-      const resp = await fetch(BG_API);
-      const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
-      if (currentBg) URL.revokeObjectURL(currentBg);
-      currentBg = url;
+    
+      // 使用预加载的图片，如果没有就立即加载
+      if (nextBg) {
+        if (currentBg) URL.revokeObjectURL(currentBg);
+        currentBg = nextBg;
+        nextBg = null;
+      } else {
+        const resp = await fetch(BG_API);
+        const blob = await resp.blob();
+        if (currentBg) URL.revokeObjectURL(currentBg);
+        currentBg = URL.createObjectURL(blob);
+      }
+    
       bgEl.style.backgroundImage = `url('${currentBg}')`;
-      
+    
+      // 预加载下一张
+      preloadBg();
+    
       // 淡入
       await new Promise(resolve => setTimeout(resolve, 50));
       bgEl.style.opacity = '1';
@@ -203,7 +231,8 @@
       bgImage.style.backgroundImage = `url('${FIXED_BG}')`;
     } else {
       toggle.checked = true;
-      switchBg();
+      // 先预加载，再切换
+      preloadBg().then(() => switchBg());
       startBgAuto();
     }
 
