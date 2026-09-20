@@ -92,8 +92,9 @@ body {
       background-position: center;
       background-repeat: no-repeat;
       opacity: 1;
-      transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
-      transform: scale(1);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: translateX(0);
+      will-change: opacity, transform;
     }
   .bg-image::after {
     content: '';
@@ -314,9 +315,6 @@ body {
   .mini-widget {
         background: linear-gradient(160deg, rgba(15,17,30,0.3) 0%, rgba(10,12,20,0.35) 100%);
         border: 1px solid rgba(255,255,255,0.05);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         border-radius: 14px;
         padding: 8px 16px;
         display: flex;
@@ -388,9 +386,6 @@ body {
   .link-card {
       background: linear-gradient(160deg, rgba(15,17,30,0.3) 0%, rgba(10,12,20,0.35) 100%);
       border: 1px solid rgba(255,255,255,0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       border-radius: 18px;
       padding: 16px;
       display: flex;
@@ -410,9 +405,6 @@ body {
           border-color: rgba(255,255,255,0.08);
           transform: translateY(-2px);
           box-shadow:
-            0 10px 32px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.04);
-      box-shadow:
         0 10px 32px var(--shadow-hover),
         inset 0 1px 0 rgba(255,255,255,0.08);
     }
@@ -661,3 +653,68 @@ body {
     background: rgba(255,255,255,0.85);
     border-color: rgba(255,255,255,1);
   }
+
+  /* 效果按钮 */
+  #effectBtn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 8px;
+    color: var(--btn-text);
+    font-size: 12px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.2s;
+  }
+  #effectBtn:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* 公祭日灰色 */
+  html.mourning, html.mourning * {
+    filter: grayscale(100%) !important;
+  }
+
+  /* 樱花容器 */
+  #sakura-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+  }
+  .sakura-petal {
+    position: absolute;
+    top: -10vh;
+    width: 16px;
+    height: 20px;
+    opacity: 0.85;
+    transform: rotate(0deg);
+    animation: sakuraFall linear forwards;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12));
+    user-select: none;
+    pointer-events: none;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><path d='M50 5 C 20 15, 5 45, 30 70 C 45 85, 55 85, 70 70 C 95 45, 80 15, 50 5 Z' fill='%23ffd6e7' stroke='%23ff9ec2' stroke-width='1'/></svg>") no-repeat center / contain;
+  }
+  @keyframes sakuraFall {
+    0% { transform: translate3d(0,0,0) rotate(0deg); opacity: 0.9; }
+    50% { transform: translate3d(calc(var(--drift,0) * 1px), 55vh,0) rotate(180deg); opacity: 1; }
+    100% { transform: translate3d(calc(var(--drift,0) * 2px), 110vh,0) rotate(720deg); opacity: 0.3; }
+  }
+
+  /* 粒子画布 */
+  #particles-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+

@@ -17,8 +17,8 @@
 <!-- 底部固定控件组 -->
 <div class="fixed-bottom">
   <!-- 背景自动切换开关 -->
-  <div class="toggle-wrap" title="背景自动切换">
-    <span class="toggle-label">自动</span>
+    <div class="toggle-wrap" title="背景随机切换">
+      <span class="toggle-label">随机背景</span>
     <label class="switch">
       <input type="checkbox" id="bgToggle" checked>
       <span class="slider"></span>
@@ -60,7 +60,7 @@
   <!-- 标签 -->
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('nav')">导航</button>
-    <button class="tab-btn" onclick="switchTab('contact')">联系</button>
+    <button class="tab-btn" onclick="switchTab('contact')">社群</button>
   </div>
   
   <!-- 导航内容 -->
@@ -113,7 +113,7 @@
   <div class="tab-content" id="tab-contact">
     <div class="contact-list">
       <a href="https://qm.qq.com/q/Qpj8jxXnmW" class="contact-card" target="_blank">
-        <div class="contact-icon qqgrp"><img src="photos/QQ.png" alt="QQ群"></div>
+        <div class="contact-icon qqgrp"><img src="https://p.qlogo.cn/gh/741215938/741215938/100" alt="QQ群"></div>
         <div class="contact-info">
           <div class="contact-name">雾光庭院交流群</div>
           <div class="contact-desc">群号：741215938</div>
@@ -135,7 +135,7 @@
 
 <script>
   // 背景图片配置（使用API获取随机横图）
-  const BG_API = 'https://api.lqay.cn/api/zxsjt/?cat=heng';
+  const BG_API = 'https://www.loliapi.com/acg/pc/';
   let currentBg = null;
   let nextBg = null;
   let bgInterval = null;
@@ -144,6 +144,8 @@
 
   // 预加载下一张背景图片
   async function preloadBg() {
+    const toggle = document.getElementById('bgToggle');
+    if (!toggle || !toggle.checked) return;
     if (nextBg) {
       URL.revokeObjectURL(nextBg);
       nextBg = null;
@@ -189,21 +191,21 @@
         newBgUrl = imgUrl;
       }
       
-      // 先设置新背景（在淡出前），避免白屏
-      bgEl.style.backgroundImage = `url('${newBgUrl}')`;
-      
-      // 开始淡出淡入
+      // 滑入效果：先移出再滑入
       bgEl.style.opacity = '0';
-      bgEl.style.transform = 'scale(1.05)';
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      bgEl.style.transform = 'translateX(100%)';
+      bgEl.style.backgroundImage = `url('${newBgUrl}')`;
+      // 强制重排以确保初始状态被应用
+      void bgEl.offsetWidth;
+
       if (currentBg) URL.revokeObjectURL(currentBg);
       currentBg = newBgUrl;
-      
-      await new Promise(resolve => setTimeout(resolve, 50));
-      bgEl.style.opacity = '1';
-      bgEl.style.transform = 'scale(1)';
+
+      // 下一帧开始过渡，避免样式被合并
+      requestAnimationFrame(() => {
+        bgEl.style.opacity = '1';
+        bgEl.style.transform = 'translateX(0)';
+      });
       
       // 预加载下一张
       preloadBg();
@@ -287,6 +289,9 @@
         stopBgAuto();
         sessionStorage.setItem('autoBg', 'off');
         bgImage.style.backgroundImage = `url('${FIXED_BG}')`;
+        // 清理预加载，避免关闭后仍请求 API
+        if (nextBg) { URL.revokeObjectURL(nextBg); nextBg = null; }
+        if (currentBg) { URL.revokeObjectURL(currentBg); currentBg = null; }
       }
     });
   })();
@@ -351,6 +356,107 @@
   updateUptime();
   setInterval(updateUptime, 1000);
 
+  // === 特效系统 ===
+  const EFFECTS = ['sakura','particles','off'];
+  let currentEffect = 'sakura'; // 强制默认樱花，可用 sessionStorage.getItem('effect') 恢复
+  // let currentEffect = sessionStorage.getItem('effect') || 'sakura';
+  const effectBtn = document.getElementById('effectBtn');
+  function updateEffectBtn(){
+    if(!effectBtn) return;
+    const map = {sakura:'樱花', particles:'粒子', off:'关闭'};
+    effectBtn.textContent = map[currentEffect] || '樱花';
+  }
+  // 国家公祭日：12月13日全站灰色
+  (function checkMourning(){
+    const now = new Date();
+    if(now.getMonth()===11 && now.getDate()===13){
+      document.documentElement.classList.add('mourning');
+    }
+  })();
+  function destroyAllEffects(){
+    const sakura = document.getElementById('sakura-container');
+    if(sakura) sakura.remove();
+    const canvas = document.getElementById('particles-canvas');
+    if(canvas) canvas.remove();
+    if(window.particleRAF) cancelAnimationFrame(window.particleRAF);
+    if(window.sakuraInterval) clearInterval(window.sakuraInterval);
+  }
+  function initSakura(){
+    // destroyAllEffects(); // 由外部统一清理
+    const container = document.getElementById('sakura-container') || (()=>{ const c=document.createElement('div'); c.id='sakura-container'; document.body.appendChild(c); return c; })();
+    if(!document.getElementById('sakura-container')) document.body.appendChild(container);
+    const sakuraContainer = document.getElementById('sakura-container');
+    function createPetal(){
+      const p = document.createElement('div');
+      p.className = 'sakura-petal';
+      p.style.left = Math.random()*100 + 'vw';
+      p.style.animationDuration = (8 + Math.random()*7) + 's';
+      p.style.width = (14 + Math.random()*12) + 'px';
+      p.style.height = (18 + Math.random()*10) + 'px';
+      p.style.opacity = 0.6 + Math.random()*0.4;
+      p.style.setProperty('--drift', Math.floor(Math.random()*200 - 100));
+      p.style.transform = `rotate(${Math.random()*360}deg)`;
+      container.appendChild(p);
+      setTimeout(()=>p.remove(), 16000);
+    }
+    for(let i=0;i<30;i++) createPetal();
+    window.sakuraInterval = setInterval(createPetal, 300);
+  }
+  function initParticles(){
+    // destroyAllEffects(); // 由外部统一清理
+    let canvas = document.getElementById('particles-canvas');
+    if(!canvas){ canvas = document.createElement('canvas'); canvas.id='particles-canvas'; document.body.appendChild(canvas); }
+    const ctx = canvas.getContext('2d');
+    let w, h, particles = [];
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    for(let i=0;i<120;i++){
+      particles.push({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        vx: (Math.random()-0.5)*0.6,
+        vy: (Math.random()-0.5)*0.6,
+        r: 1 + Math.random()*2
+      });
+    }
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      for(const p of particles){
+        p.x += p.vx; p.y += p.vy;
+        if(p.x<0||p.x>w) p.vx*=-1;
+        if(p.y<0||p.y>h) p.vy*=-1;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
+      }
+      window.particleRAF = requestAnimationFrame(draw);
+    }
+    draw();
+  }
+  function applyEffect(effect){
+    destroyAllEffects();
+    // 共存模式：樱花 + 粒子同时存在
+    initSakura();
+    initParticles();
+    currentEffect = effect;
+    sessionStorage.setItem('effect', effect);
+    updateEffectBtn();
+  }
+  // 默认启动特效，不依赖按钮存在
+  updateEffectBtn();
+  applyEffect(currentEffect);
+  if(effectBtn){
+    effectBtn.addEventListener('click', ()=>{
+      const idx = EFFECTS.indexOf(currentEffect);
+      const next = EFFECTS[(idx+1)%EFFECTS.length];
+      applyEffect(next);
+    });
+  }
 </script>
 </body>
 </html>
