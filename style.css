@@ -718,3 +718,18 @@ body {
     z-index: 2;
   }
 
+  /* 网易云播放器 左下角 */
+  .music-player {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 10;
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 6px;
+    box-shadow: 0 4px 16px var(--shadow);
+  }
+
