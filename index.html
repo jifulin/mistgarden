@@ -136,6 +136,7 @@
   let currentBg = null;
   let bgInterval = null;
   const AUTO_INTERVAL = 6000; // 6秒
+  const FIXED_BG = 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/h/真尋1184.png';
 
   async function switchBg() {
     try {
@@ -160,30 +161,69 @@
     bgInterval = null;
   }
 
-  // 初始化背景
-  // 记住背景自动切换状态
-  const autoBg = localStorage.getItem('autoBg');
-  const toggle = document.getElementById('bgToggle');
-  if (autoBg === 'on' || autoBg === null) {
-    toggle.checked = true;
-    switchBg();
-    startBgAuto();
-  } else {
-    toggle.checked = false;
-    stopBgAuto();
-  }
+  // 页面加载初始化
+  (function() {
+    const html = document.documentElement;
+    const toggle = document.getElementById('bgToggle');
+    const bgImage = document.getElementById('bgImage');
 
-  // 切换事件
-  toggle.addEventListener('change', function() {
-    if (this.checked) {
+    // === 主题初始化：手动优先级 > 时间自动 ===
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      html.setAttribute('data-theme', 'light');
+      document.getElementById('themeBtn').textContent = '☀️';
+    } else if (savedTheme === 'dark') {
+      html.removeAttribute('data-theme');
+      document.getElementById('themeBtn').textContent = '🌙';
+    } else {
+      // 无手动记录，按时间自动（6:00-18:00 白天）
+      const hour = new Date().getHours();
+      if (hour >= 6 && hour < 18) {
+        html.setAttribute('data-theme', 'light');
+        document.getElementById('themeBtn').textContent = '☀️';
+      }
+    }
+
+    // === 背景自动切换初始化 ===
+    const autoBg = localStorage.getItem('autoBg');
+    if (autoBg === 'off') {
+      toggle.checked = false;
+      stopBgAuto();
+      bgImage.style.backgroundImage = `url('${FIXED_BG}')`;
+    } else {
+      toggle.checked = true;
       switchBg();
       startBgAuto();
-      localStorage.setItem('autoBg', 'on');
-    } else {
-      stopBgAuto();
-      localStorage.setItem('autoBg', 'off');
     }
-  });
+
+    // === 主题切换事件 ===
+    document.getElementById('themeBtn').addEventListener('click', function() {
+      if (html.getAttribute('data-theme') === 'light') {
+        html.removeAttribute('data-theme');
+        this.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        this.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // === 背景开关切换事件 ===
+    toggle.addEventListener('change', function() {
+      if (this.checked) {
+        switchBg();
+        startBgAuto();
+        localStorage.setItem('autoBg', 'on');
+      } else {
+        stopBgAuto();
+        localStorage.setItem('autoBg', 'off');
+        bgImage.style.backgroundImage = `url('${FIXED_BG}')`;
+      }
+    });
+  })();
+
+  // === 页面运行时功能 ===
   function updateClock() {
     const now = new Date();
     const time = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -234,49 +274,6 @@
   }
   updateUptime();
   setInterval(updateUptime, 1000);
-
-  // 主题切换
-  function toggleTheme() {
-    const html = document.documentElement;
-    const btn = document.getElementById('themeBtn');
-    if (html.getAttribute('data-theme') === 'light') {
-      html.removeAttribute('data-theme');
-      btn.textContent = '🌙';
-      localStorage.setItem('theme', 'dark');
-    } else {
-      html.setAttribute('data-theme', 'light');
-      btn.textContent = '☀️';
-      localStorage.setItem('theme', 'light');
-    }
-  }
-  // 记住主题偏好
-  (function() {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.getElementById('themeBtn').textContent = '☀️';
-    }
-    // 记住背景自动切换状态
-    const autoBg = localStorage.getItem('autoBg');
-    const toggle = document.getElementById('bgToggle');
-    if (autoBg === 'off') {
-      toggle.checked = false;
-      stopBgAuto();
-    } else {
-      toggle.checked = true;
-      startBgAuto();
-    }
-    // 切换事件
-    toggle.addEventListener('change', function() {
-      if (this.checked) {
-        startBgAuto();
-        localStorage.setItem('autoBg', 'on');
-      } else {
-        stopBgAuto();
-        localStorage.setItem('autoBg', 'off');
-      }
-    });
-  })();
 
 </script>
 </body>
