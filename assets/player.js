@@ -158,7 +158,7 @@
    *      所以这里直接操作 audio 元素，自己拿 Promise 才能知道有没有被策略拦下。
    *      界面不用管：APlayer 监听媒体事件（play/pause/ended）自己会同步。
    * ====================================================== */
-  var VOLUME   = 0.05;                  // 播放音量 0~1
+  var VOLUME   = 0.1;                  // 播放音量 0~1
   var ASK_KEY  = 'mistgarden-music';    // sessionStorage：'play' 已同意 / 'off' 已拒绝
   var wantPlay = false;                 // 用户同意播放（此时播放器可能还没就绪）
   var asked    = false;                 // 本次会话已经弹过询问框，不再重复弹
