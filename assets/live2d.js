@@ -17,7 +17,6 @@
   var MODELS_JSON = 'models/models.json';
   var MODELS_DIR  = 'models/';
   var RUNTIME_DIR = 'assets/live2d/';
-  var STATE_KEY   = 'mistgarden-live2d';   // sessionStorage：'on' / 'off'
   var FIT_W       = 0.94;                  // 模型宽度占容器宽度的比例（留出 EDGE_PAD 的余量）
   var FIT_H       = 0.96;                  // 模型高度占容器高度的比例
   var EDGE_PAD    = 6;                     // 距容器右/下的留白，别贴着屏幕边
@@ -28,12 +27,7 @@
   var switchBtn = document.getElementById('live2dSwitch');
   if (!wrap || !canvas || !btn) return;
 
-  // 手机上不自动加载看板娘：省流量，也不跟占满底部的播放器挤（按钮在 CSS 里也藏了）。
-  // 只挡「自动加载」——按钮依然可用，所以平板这类宽屏触摸设备想看得自己点一下。
-  var narrow = window.matchMedia && window.matchMedia('(max-width: 640px)').matches;
-  var touch  = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-  var AUTO_OK = !narrow && !touch;
-
+  // 模型只在用户点击按钮后加载；手机端入口由 CSS 隐藏。
   var app = null;
   var model = null;
   var baseH = 0;                 // scale=1 时模型的高度，用来算自适应缩放
@@ -61,9 +55,6 @@
     el.textContent = text || '';
     el.hidden = !text;
   }
-
-  function save(v) { try { sessionStorage.setItem(STATE_KEY, v); } catch (e) {} }
-  function saved() { try { return sessionStorage.getItem(STATE_KEY); } catch (e) { return null; } }
 
   /* ======================= 运行时 / 清单 ======================= */
   function ensureRuntime() {
@@ -146,11 +137,14 @@
   function syncUI() {
     btn.textContent = '🎀';
     btn.title = on ? '隐藏看板娘' : '显示看板娘';
+    btn.setAttribute('aria-label', '看板娘');
+    btn.setAttribute('aria-pressed', String(on));
     btn.classList.toggle('is-off', !on);
     if (switchBtn) {
       switchBtn.hidden = !(on && models.length > 1);
       var next = models.length > 1 ? models[(index + 1) % models.length].name : '';
       switchBtn.title = models.length > 1 ? '切换模型（下一个：' + next + '）' : '切换模型';
+      switchBtn.setAttribute('aria-label', switchBtn.title);
     }
   }
 
@@ -167,7 +161,6 @@
         if (app) app.start();
         fit();
         on = true;
-        save('on');
         tip('');
         syncUI();
       })
@@ -185,7 +178,6 @@
     on = false;
     wrap.hidden = true;
     if (app) app.stop();                      // 藏起来就别再渲染了，省电
-    save('off');
     syncUI();
   }
 
@@ -220,11 +212,12 @@
     get models() { return models; }
   };
 
-  // 默认就显示，但等页面空闲下来再加载，别跟导航页首屏抢带宽
-  // 手机/触摸设备不自动加载（AUTO_OK），要看得手动点 🎀
-  if (AUTO_OK && saved() !== 'off') {
-    var kick = function () { if (saved() !== 'off' && !on) show(); };
-    if (window.requestIdleCallback) requestIdleCallback(kick, { timeout: 2500 });
-    else setTimeout(kick, 1200);
-  }
+  // 页面切入后台时暂停 GPU 动画；在手机尺寸下隐藏并停掉已开启模型。
+  document.addEventListener('visibilitychange', function () {
+    if (!app || !on) return;
+    if (document.hidden) app.stop(); else app.start();
+  });
+  window.addEventListener('resize', function () {
+    if (window.innerWidth <= 640 && on) hide();
+  });
 })();

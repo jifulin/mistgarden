@@ -29,7 +29,6 @@
   var CONCURRENCY = 2;              // 后台预热并发数（调高会被接口限流 503）
   var GAP         = 260;            // 相邻请求间隔(ms)
   var RETRY       = 3;              // 单个请求失败重试次数
-  var WARMUP      = 20;             // 进入页面时后台预热的曲目数（其余点到时即时解析）
 
   /* ======================= 基础设施 ======================= */
   var container = document.getElementById('musicPlayer');
@@ -143,84 +142,22 @@
     }
   }
 
-  /* ======================= 自动播放 =======================
-   * 浏览器策略：带声音的自动播放必须有用户手势，静音自动播放虽然允许，
-   * 但用户要的是「有声音」，所以不再静音偷播，改成进页面弹一个询问框：
-   *   点「播放」→ 按钮点击本身就是手势，可以正常带声音起播
-   *   点「关闭」→ 不自动播（播放器仍在左下角，随时可手动点播放）
-   * 选择记在 sessionStorage：同一次浏览不再反复问，新开会话再问一次。
-   *
-   * 两个坑（都踩过）：
-   *   1. APlayer 没有 muted 选项，options 里写 muted:true 是无效的；
-   *      它的 autoplay 又是在构造函数里同步 play()，那一刻还没机会做别的处理，
-   *      所以关掉 options.autoplay，起播时机全部自己控制。
-   *   2. APlayer 的 play() 不返回 Promise（内部把 NotAllowedError 吞了，只把界面切回暂停），
-   *      所以这里直接操作 audio 元素，自己拿 Promise 才能知道有没有被策略拦下。
-   *      界面不用管：APlayer 监听媒体事件（play/pause/ended）自己会同步。
-   * ====================================================== */
-  var VOLUME   = 0.1;                  // 播放音量 0~1
-  var ASK_KEY  = 'mistgarden-music';    // sessionStorage：'play' 已同意 / 'off' 已拒绝
-  var wantPlay = false;                 // 用户同意播放（此时播放器可能还没就绪）
-  var asked    = false;                 // 本次会话已经弹过询问框，不再重复弹
-
-  function showAsk() {
-    var el = document.getElementById('playAsk');
-    if (!el || asked || !el.hidden) return;
-    asked = true;
-    el.hidden = false;
-    requestAnimationFrame(function () { el.classList.add('show'); });
-  }
-
-  function hideAsk() {
-    var el = document.getElementById('playAsk');
-    asked = true;
-    if (!el) return;
-    el.classList.remove('show');
-    setTimeout(function () { el.hidden = true; }, 260);
-  }
-
-  // 带声音起播。必须在用户手势中（或手势之后）调用，否则会被浏览器拦下。
-  function startPlay() {
-    wantPlay = true;
-    if (!ap || !ap.audio) return;        // 播放器还没建好 → initPlayer 里补播
-    ap.audio.muted = false;
-    try { ap.volume(VOLUME); } catch (e) { /* 忽略 */ }
-    safePlay();
-  }
-
-  function safePlay() {
+  // 用户同意后自动尝试播放第一首；个别浏览器可能要求再次点击播放键。
+  var VOLUME = 0.1;
+  function safePlay(initial) {
     if (!ap || !ap.audio) return;
-    var a = ap.audio;
-    var p = a.play();
-    if (p && typeof p.catch === 'function') {
-      p.catch(function (err) {
-        if (err && err.name === 'AbortError') return;
-        if (err && err.name === 'NotAllowedError') showAsk();   // 没有手势 → 让用户自己点
-        else ap.notice('点击播放按钮开始播放', 2600, 0.95);
+    var attempt;
+    try { attempt = ap.audio.play(); }
+    catch (err) { ap.notice('播放失败，请点击播放按钮重试', 4000, 0.95); return; }
+    if (attempt && typeof attempt.catch === 'function') {
+      attempt.catch(function (err) {
+        if (err && err.name === 'AbortError' && !initial) return;
+        ap.notice(initial && err && err.name === 'NotAllowedError'
+          ? '浏览器限制自动播放，请点击播放按钮'
+          : '播放失败，请点击播放按钮重试', 4000, 0.95);
       });
     }
   }
-
-  // 询问框的两个按钮
-  (function bindAsk() {
-    var yes = document.getElementById('playAskYes');
-    var no  = document.getElementById('playAskNo');
-    if (yes) yes.addEventListener('click', function () {
-      try { sessionStorage.setItem(ASK_KEY, 'play'); } catch (e) {}
-      hideAsk();
-      startPlay();
-    });
-    if (no) no.addEventListener('click', function () {
-      try { sessionStorage.setItem(ASK_KEY, 'off'); } catch (e) {}
-      wantPlay = false;
-      hideAsk();
-    });
-  })();
-
-  // 本次会话的选择：同意过 → 就绪后直接尝试带声音播（被拦会自己再弹询问框）
-  var savedAsk = null;
-  try { savedAsk = sessionStorage.getItem(ASK_KEY); } catch (e) {}
-  if (savedAsk === 'play') wantPlay = true;
 
   function bindEvents() {
     // 列表里点到还没解析完的曲目：先解析，再切换（拦在 APlayer 自己的点击处理之前）
@@ -246,7 +183,6 @@
     // 上一首 / 下一首 / 自动切歌时兜底解析
     ap.on('listswitch', function (info) {
       var i = info.index;
-      enqueue([i + 1, i + 2, i + 3]);      // 顺手预热后面几首
       if (isReady(i)) return;
       ap.notice('正在解析音源…', 1200, 0.95);
       resolve(i).then(function () {
@@ -280,7 +216,7 @@
       audio: audios,
       theme: '#ff8fab',
       volume: VOLUME,
-      // autoplay 交给下面的询问框逻辑（原因见「自动播放」注释）
+      // 声音由下方的用户同意分支触发，避免构造时无手势自动播放。
       autoplay: false,
       mutex: true,
       lrcType: 3,
@@ -292,19 +228,17 @@
 
     bindEvents();
 
-    // === 起播：同意过才播，没问过就弹询问框 ===
-    ap.audio.setAttribute('playsinline', '');   // iOS 上避免被系统接管成全屏播放
-    ap.audio.muted = false;                     // 保持能出声，用户手动点播放时不会被静音
-    if (wantPlay) startPlay();                  // 已同意（含「播放器就绪前就点了播放」）
-    else if (savedAsk !== 'off') showAsk();     // 没问过 → 弹一次
-
-    // 后台预热前 WARMUP 首，其余曲目点到时即时解析，避免对接口造成无谓压力
-    // 用户选了「关闭」就不预热，省掉这 20 组请求
-    if (wantPlay || savedAsk !== 'off') {
-      var warm = [];
-      for (var i = 0; i < audios.length && i < WARMUP; i++) warm.push(i);
-      setTimeout(function () { enqueue(warm); }, 800);
+    // 点击询问框「播放」后，在第一首音源解析完成时立即尝试起播。
+    ap.audio.setAttribute('playsinline', '');
+    ap.audio.muted = false;
+    ap.audio.addEventListener('play', function () { enqueue([ap.list.index + 1]); });
+    var panel = container.closest('.music-player');
+    if (panel && panel.dataset.playOnReady === 'true') {
+      delete panel.dataset.playOnReady;
+      try { ap.volume(VOLUME); } catch (e) {}
+      safePlay(true);
     }
+    document.dispatchEvent(new Event('mistgarden:music-ready'));
   }
 
   /* ======================= 启动 ======================= */
@@ -324,7 +258,7 @@
         };
       });
 
-      return resolve(0);             // 先把第一首备好，保证进来就能播
+      return resolve(0);             // 用户同意播放后才解析当前曲目
     }).then(initPlayer).catch(function (err) {
       console.warn('[music] 播放器初始化失败：', err);
       container.textContent = '🎵 音源加载失败';

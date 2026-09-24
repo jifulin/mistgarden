@@ -9,7 +9,7 @@
 <!-- 资源版本号：改完 style.css / player.js / live2d.js 记得把下面几处的 ?v= 一起改
      （站点走 Cloudflare，CSS/JS 边缘缓存 4 小时；不换版本号的话会出现「新 HTML + 旧 CSS」，
       看板娘容器拿不到 position:fixed，整页被顶下去一大块） -->
-<link rel="stylesheet" href="style.css?v=20260920d">
+<link rel="stylesheet" href="style.css?v=20260924b">
 
 </head>
 <body>
@@ -22,30 +22,27 @@
 
 <!-- Live2D 看板娘：整块 pointer-events:none，纯装饰，不会挡住页面点击 -->
 <div class="live2d-wrap" id="live2dWrap" hidden>
-  <div class="live2d-tip" id="live2dTip" hidden></div>
+  <div class="live2d-tip" id="live2dTip" role="status" aria-live="polite" hidden></div>
   <canvas class="live2d-canvas" id="live2dCanvas"></canvas>
 </div>
 
 <!-- 底部固定控件组 -->
 <div class="fixed-bottom">
-  <!-- 背景自动切换开关 -->
-    <div class="toggle-wrap" title="背景随机切换">
-      <span class="toggle-label">随机背景</span>
-    <label class="switch">
+  <label class="toggle-wrap" for="bgToggle">
+    <span class="toggle-label">随机背景</span>
+    <span class="switch">
       <input type="checkbox" id="bgToggle" checked>
-      <span class="slider"></span>
-    </label>
-  </div>
-  <!-- 主题切换 -->
-  <button onclick="toggleTheme()" id="themeBtn">🌙</button>
-  <!-- Live2D 看板娘：显示/隐藏；models.json 里有多个模型时才会出现切换按钮 -->
-  <button id="live2dBtn" type="button" title="显示看板娘">🎀</button>
-  <button id="live2dSwitch" type="button" title="切换模型" hidden>🔄</button>
+      <span class="slider" aria-hidden="true"></span>
+    </span>
+  </label>
+  <button id="themeBtn" type="button" aria-label="浅色主题" aria-pressed="false">🌙</button>
+  <button id="live2dBtn" type="button" title="显示看板娘" aria-label="看板娘" aria-pressed="false">🎀</button>
+  <button id="live2dSwitch" type="button" title="切换模型" aria-label="切换看板娘模型" hidden>🔄</button>
 </div>
 
-<div class="container">
+<main class="container">
   <!-- 头部 -->
-  <div class="header">
+  <header class="header">
     <div class="avatar-wrap">
       <img class="avatar" src="https://p.qlogo.cn/gh/741215938/741215938/640" alt="">
     </div>
@@ -53,10 +50,10 @@
     <p class="desc">
       <span>雾</span><span>光</span><span>庭</span><span>院</span><span>引</span><span>导</span><span>页</span><span>·</span><span>收</span><span>藏</span><span>本</span><span>页</span><span>面</span><span>防</span><span>失</span><span>联</span>
     </p>
-  </div>
+  </header>
 
   <!-- 一言 -->
-  <div class="hitokoto" id="hitokoto" onclick="fetchHitokoto()" title="点击刷新">加载中...</div>
+  <button class="hitokoto" id="hitokoto" type="button" title="点击刷新" aria-label="刷新一言">加载中...</button>
 
   <!-- 毛玻璃内容区 -->
   <div class="glass-card">
@@ -73,14 +70,14 @@
   </div>
   
   <!-- 标签 -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('nav')">导航</button>
-    <button class="tab-btn" onclick="switchTab('contact')">社群</button>
+  <div class="tabs" role="tablist" aria-label="内容分类">
+    <button class="tab-btn active" id="tabNav" type="button" role="tab" aria-selected="true" aria-controls="tab-nav" tabindex="0" data-tab="nav">导航</button>
+    <button class="tab-btn" id="tabContact" type="button" role="tab" aria-selected="false" aria-controls="tab-contact" tabindex="-1" data-tab="contact">社群</button>
   </div>
   
   <!-- 导航内容 -->
-  <div class="tab-content active" id="tab-nav">
-    <div class="link-grid">
+  <div class="tab-content active" id="tab-nav" role="tabpanel" aria-labelledby="tabNav" tabindex="0">
+    <nav class="link-grid" aria-label="常用站点">
       <a href="https://wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
         <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻413.jpg" alt=""></div>
         <div class="card-info"><div class="card-name">主页</div><div class="card-desc">雾光庭院主页</div></div>
@@ -121,11 +118,11 @@
         <div class="card-info"><div class="card-name">画廊</div><div class="card-desc">图片画廊</div></div>
         <span class="arrow">→</span>
       </a>
-    </div>
+    </nav>
   </div>
   
   <!-- 联系内容 -->
-  <div class="tab-content" id="tab-contact">
+  <div class="tab-content" id="tab-contact" role="tabpanel" aria-labelledby="tabContact" tabindex="0" hidden>
     <div class="contact-list">
       <a href="https://qm.qq.com/q/Qpj8jxXnmW" class="contact-card" target="_blank" rel="noopener noreferrer">
         <div class="contact-icon qqgrp"><img src="https://p.qlogo.cn/gh/741215938/741215938/100" alt="QQ群"></div>
@@ -144,9 +141,9 @@
     </div>
   </div>
   
-  <div class="footer"><a href="https://github.com/jifulin/mistgarden" target="_blank" rel="noopener noreferrer">雾光庭院</a> · <span id="uptime"></span></div>
+  <footer class="footer"><a href="https://github.com/jifulin/mistgarden" target="_blank" rel="noopener noreferrer">雾光庭院</a> · <span id="uptime"></span></footer>
   </div><!-- /glass-card -->
-</div><!-- /container -->
+</main><!-- /container -->
 
 <script>
   // 背景图片配置（使用API获取随机横图）
@@ -280,18 +277,19 @@
     const savedTheme = sessionStorage.getItem('theme');
     if (savedTheme === 'light') {
       html.setAttribute('data-theme', 'light');
-      document.getElementById('themeBtn').textContent = '☀️';
-    } else if (savedTheme === 'dark') {
-      html.removeAttribute('data-theme');
-      document.getElementById('themeBtn').textContent = '🌙';
-    } else {
-      // 无手动记录，按时间自动（6:00-18:00 白天）
+    } else if (savedTheme !== 'dark') {
       const hour = new Date().getHours();
-      if (hour >= 6 && hour < 18) {
-        html.setAttribute('data-theme', 'light');
-        document.getElementById('themeBtn').textContent = '☀️';
-      }
+      if (hour >= 6 && hour < 18) html.setAttribute('data-theme', 'light');
     }
+    function syncThemeButton() {
+      const light = html.getAttribute('data-theme') === 'light';
+      const button = document.getElementById('themeBtn');
+      button.textContent = light ? '☀️' : '🌙';
+      button.setAttribute('aria-label', '浅色主题');
+      button.setAttribute('aria-pressed', String(light));
+      button.title = light ? '切换为深色主题' : '切换为浅色主题';
+    }
+    syncThemeButton();
 
     // === 背景自动切换初始化 ===
     const autoBg = sessionStorage.getItem('autoBg');
@@ -310,13 +308,12 @@
     document.getElementById('themeBtn').addEventListener('click', function() {
       if (html.getAttribute('data-theme') === 'light') {
         html.removeAttribute('data-theme');
-        this.textContent = '🌙';
         sessionStorage.setItem('theme', 'dark');
       } else {
         html.setAttribute('data-theme', 'light');
-        this.textContent = '☀️';
         sessionStorage.setItem('theme', 'light');
       }
+      syncThemeButton();
     });
 
     // === 背景开关切换事件 ===
@@ -342,7 +339,63 @@
     const player = document.querySelector('.music-player');
     const bar = document.querySelector('.fixed-bottom');
     const btn = document.getElementById('musicToggle');
-    if (!player || !bar) return;
+    if (!player || !bar || !btn) return;
+
+    // 音乐播放器完全按需加载：首访不请求播放器资源、歌单或音源。
+    let musicAssetsPromise = null;
+    let consentGranted = false;
+    const ask = document.getElementById('playAsk');
+    const askYes = document.getElementById('playAskYes');
+    const askNo = document.getElementById('playAskNo');
+    function showPlayAsk() {
+      if (!ask || ask.open) return;
+      ask.showModal();
+      askNo.focus();          // 默认聚焦不会触发加载的选项
+    }
+    askYes.addEventListener('click', function () {
+      consentGranted = true;
+      player.dataset.playOnReady = 'true';
+      ask.close();
+      apply(true);            // 只在用户点了「播放」之后请求播放器和音源
+    });
+    askNo.addEventListener('click', function () {
+      ask.close();            // 不启动脚本、歌单、音源或音乐播放器
+    });
+    // 原生 dialog 的 Esc/cancel 也等同于关闭；没有同意就不会加载。
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = () => { script.remove(); reject(new Error('脚本加载失败：' + src)); };
+        document.body.appendChild(script);
+      });
+    }
+    function loadMusicAssets() {
+      if (musicAssetsPromise) return musicAssetsPromise;
+      const slot = document.getElementById('musicPlayer');
+      slot.textContent = '🎵 正在加载音乐…';
+      const stylesheet = document.getElementById('aplayerStylesheet');
+      const styleReady = stylesheet ? Promise.resolve() : new Promise((resolve, reject) => {
+        const link = document.createElement('link');
+        link.id = 'aplayerStylesheet';
+        link.rel = 'stylesheet';
+        link.href = 'assets/APlayer.min.css?v=20260920c';
+        link.onload = resolve;
+        link.onerror = () => { link.remove(); reject(new Error('播放器样式加载失败')); };
+        document.head.insertBefore(link, document.querySelector('link[href^="style.css"]'));
+      });
+      musicAssetsPromise = styleReady
+        .then(() => window.APlayer ? null : loadScript('assets/APlayer.min.js?v=20260920c'))
+        .then(() => loadScript('assets/player.js?v=20260924b'))
+        .catch(error => {
+          console.warn('[music] 加载失败：', error);
+          slot.textContent = '🎵 加载失败，收起后可重试';
+          musicAssetsPromise = null;
+        });
+      return musicAssetsPromise;
+    }
 
     const BTN      = 44;      // 按钮的布局尺寸（固定；贴边靠 transform 缩小，命中区不缩水）
     const DOCK_GAP = 2;       // 贴边后离屏幕边缘几像素
@@ -351,7 +404,7 @@
     const clamp = function (v, min, max) { return Math.min(Math.max(v, min), max); };
     let pos = null;                        // 按钮布局左上角（视口坐标）
     let dock = { x: null, y: null };        // 当前贴住哪几条边
-    let open = true;
+    let open = false;
     let side = 'left';                     // 展开时播放器贴哪边，跟着按钮走
     let suppressClick = false;             // 刚拖完那一下不算点击
     let drag = null;
@@ -373,7 +426,7 @@
       if (!btn) return;
       if (mq.matches) { btn.style.height = ''; return; }     // 手机端是 44×44，交回 CSS
       const h = player.offsetHeight;
-      if (h) btn.style.height = h + 'px';
+      if (h) btn.style.height = Math.max(44, h) + 'px';
     }
 
     if (window.ResizeObserver) new ResizeObserver(function () { sync(); syncHandle(); }).observe(player);
@@ -383,19 +436,21 @@
     // 播放器内容是异步出来的（歌单、歌词、字体），补校准几次
     [400, 1500, 3000].forEach(function (t) { setTimeout(function () { sync(); syncHandle(); }, t); });
 
-    if (!btn) return;
-
     /* --- 展开/收回：手机默认收起，不挡页脚 --- */
     function apply(next) {
       open = next;
+      if (!open && player.contains(document.activeElement)) btn.focus();
       player.classList.toggle('is-collapsed', !open);
       player.classList.toggle('is-right', side === 'right');
-      btn.textContent = open ? (mq.matches ? '✕' : '«') : '🎵';   // 桌面端拉开时显示「收回」箭头
-      btn.title = open ? '收起播放器' : '展开播放器';
+      player.inert = !open;
+      player.setAttribute('aria-hidden', String(!open));
+      btn.textContent = open ? (mq.matches ? '✕' : '«') : '🎵';
+      const label = open ? '收起音乐播放器' : '展开音乐播放器';
+      btn.title = label;
+      btn.setAttribute('aria-label', label);
       btn.setAttribute('aria-expanded', String(open));
-      // 桌面端：手柄跟着抽屉一起被推出去（手机端手柄是独立的浮动按钮，不动）
       btn.classList.toggle('is-drawer-open', open && !mq.matches);
-      if (open) placePlayer();
+      if (open) { placePlayer(); if (consentGranted) loadMusicAssets(); }
       sync();
       if (open) armIdle(); else keepOpen();
     }
@@ -407,7 +462,7 @@
     function keepOpen() { clearTimeout(idleTimer); idleTimer = null; }
     function armIdle() {
       keepOpen();
-      if (mq.matches || !open || hovering) return;   // 手机端不自动收；鼠标停在播放器上也不收
+      if (mq.matches || !open || hovering || player.dataset.playOnReady === 'true') return;   // 音源尚未就绪时也不自动收起
       idleTimer = setTimeout(function () { if (!mq.matches && !hovering && open) apply(false); }, IDLE_MS);
     }
     player.addEventListener('mouseenter', function () { hovering = true; keepOpen(); });
@@ -417,10 +472,15 @@
     btn.addEventListener('mouseenter', function () { if (!mq.matches) armIdle(); });
 
     player.classList.toggle('is-drawer', !mq.matches);     // 抽屉的收起样式只在桌面端生效
-    apply(!mq.matches);                            // 桌面端先展开（随后闲置自动收回），手机端默认收起
+    apply(false);                                  // 所有设备默认收起，不触发资源加载
+    function togglePlayer() {
+      if (open) { apply(false); return; }
+      if (!consentGranted) { showPlayAsk(); return; }
+      apply(true);
+    }
     btn.addEventListener('click', function () {
       if (suppressClick) { suppressClick = false; return; }
-      apply(!open);
+      togglePlayer();
     });
 
     /* --- 播放器跟着按钮走：放按钮下方，下方放不下就放上方，横向占满 --- */
@@ -526,36 +586,39 @@
       btn.classList.remove('is-dragging');
       if (moved) layoutButton(true);                       // 松手再存一次位置（贴边后的最终位置）
       // 没拖动就是点了一下 = 开关。不用等 click：pointerdown 拦了默认行为后 click 不一定派发
-      if (!moved && !cancelled) apply(!open);
+      if (!moved && !cancelled) togglePlayer();
       suppressClick = true;                                // 真来了 click 也别再切一次
       setTimeout(function () { suppressClick = false; }, 350);
     }
     btn.addEventListener('pointerup', function (e) { endDrag(e, false); });
     btn.addEventListener('pointercancel', function (e) { endDrag(e, true); });
 
-    // 在询问框里选了「播放」= 现在就想听，顺手把播放器展开
-    const yes = document.getElementById('playAskYes');
-    if (yes) yes.addEventListener('click', function () { if (mq.matches) apply(true); });
-
     // 窗口从桌面缩到手机宽度（或反过来）时，跟着切到对应的默认状态
     function onMq() {
       if (!mq.matches) clearPlayerStyle();      // 回桌面端：位置交回 CSS，别留内联样式
       player.classList.toggle('is-drawer', !mq.matches);
-      apply(!mq.matches);
+      apply(open);
       syncHandle();
       armIdle();
     }
     if (mq.addEventListener) mq.addEventListener('change', onMq);
     else if (mq.addListener) mq.addListener(onMq);
 
-    // 收起状态下音乐还在放：按钮呼吸提示（APlayer 的 audio 元素是异步建出来的，找不到就重试）
-    (function watchAudio(tries) {
-      const au = player.querySelector('audio');
-      if (!au) { if (tries < 25) setTimeout(function () { watchAudio(tries + 1); }, 400); return; }
-      const mark = function () { btn.classList.toggle('is-playing', !au.paused); };
-      ['play', 'pause', 'ended'].forEach(function (e) { au.addEventListener(e, mark); });
+    // 异步创建 audio 后再观察播放状态，不轮询、也不在首访初始化播放器。
+    let watchedAudio = null;
+    function watchAudio() {
+      const audio = player.querySelector('audio');
+      if (!audio || audio === watchedAudio) return;
+      watchedAudio = audio;
+      const mark = () => btn.classList.toggle('is-playing', !audio.paused);
+      ['play', 'pause', 'ended'].forEach(name => audio.addEventListener(name, mark));
       mark();
-    })(0);
+    }
+    document.addEventListener('mistgarden:music-ready', function () {
+      watchAudio();
+      if (open) armIdle();
+    });
+    showPlayAsk();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupMobileBottomUI);
   else setupMobileBottomUI();
@@ -571,13 +634,33 @@
   updateClock();
   setInterval(updateClock, 1000);
   
-  // 标签切换
-  function switchTab(name) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    event.target.classList.add('active');
+  // 可用键盘操作的标签页：点击、左右方向键、Home/End 都同步更新面板。
+  const tabButtons = Array.from(document.querySelectorAll('.tab-btn'));
+  function switchTab(nextButton, focusButton = false) {
+    tabButtons.forEach(button => {
+      const selected = button === nextButton;
+      button.classList.toggle('active', selected);
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      const panel = document.getElementById(button.getAttribute('aria-controls'));
+      panel.classList.toggle('active', selected);
+      panel.hidden = !selected;
+    });
+    if (focusButton) nextButton.focus();
   }
+  tabButtons.forEach(button => button.addEventListener('click', () => switchTab(button)));
+  document.querySelector('.tabs').addEventListener('keydown', e => {
+    const current = tabButtons.indexOf(e.target);
+    if (current < 0) return;
+    let next = current;
+    if (e.key === 'ArrowRight') next = (current + 1) % tabButtons.length;
+    else if (e.key === 'ArrowLeft') next = (current - 1 + tabButtons.length) % tabButtons.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = tabButtons.length - 1;
+    else return;
+    e.preventDefault();
+    switchTab(tabButtons[next], true);
+  });
   
   // 一言
   async function fetchHitokoto() {
@@ -586,6 +669,7 @@
       const data = await resp.json();
       const el = document.getElementById('hitokoto');
       el.textContent = data.hitokoto;
+      el.setAttribute('aria-label', '刷新一言：' + data.hitokoto);
       if (data.from) el.title = `——《${data.from}》`;
       // 白天模式一言两种可读配色
       if (document.documentElement.getAttribute('data-theme') === 'light') {
@@ -596,9 +680,12 @@
         }
       }
     } catch (e) {
-      document.getElementById('hitokoto').textContent = '点击获取一句话';
+      const el = document.getElementById('hitokoto');
+      el.textContent = '点击获取一句话';
+      el.setAttribute('aria-label', '刷新一言，当前加载失败');
     }
   }
+  document.getElementById('hitokoto').addEventListener('click', fetchHitokoto);
   fetchHitokoto();
 
   // 运行时间计数器
@@ -721,50 +808,23 @@
     initParticles();
   }
 </script>
-<!-- 自动播放询问弹窗：浏览器禁止网页自动出声，需要用户点一下才能起播 -->
-<div class="play-ask" id="playAsk" hidden>
+<!-- 原生对话框保证聚焦和 Esc 关闭；用户选择前不请求任何音乐资源。 -->
+<dialog class="play-ask" id="playAsk" aria-labelledby="playAskTitle" aria-describedby="playAskDesc">
   <div class="play-ask-card">
-    <div class="play-ask-icon">🎵</div>
-    <div class="play-ask-title">要播放背景音乐吗？</div>
-    <div class="play-ask-desc">浏览器不允许自动出声，点「播放」就能开始</div>
+    <div class="play-ask-icon" aria-hidden="true">🎵</div>
+    <h2 class="play-ask-title" id="playAskTitle">要播放背景音乐吗？</h2>
+    <p class="play-ask-desc" id="playAskDesc">点击播放将加载播放器并开始播放歌曲；关闭则不会加载音乐。</p>
     <div class="play-ask-btns">
-      <button class="play-ask-btn primary" id="playAskYes" type="button">🔊 播放</button>
-      <button class="play-ask-btn" id="playAskNo" type="button">🔇 关闭</button>
+      <button class="play-ask-btn primary" id="playAskYes" type="button">▶ 播放</button>
+      <button class="play-ask-btn" id="playAskNo" type="button">关闭</button>
     </div>
   </div>
+</dialog>
+<!-- 音乐入口：用户同意播放后才加载 APlayer、歌单和音源 -->
+<div class="music-player is-collapsed" id="musicPanel" role="region" aria-label="音乐播放器" aria-hidden="true" inert>
+  <div id="musicPlayer" aria-live="polite">🎵 点击展开以加载音乐</div>
 </div>
-<!-- 音乐播放器 左下角（本地音源，不使用 CDN） -->
-<!-- 外层 .music-player 负责 fixed 定位，内层 #musicPlayer 才是 APlayer 的容器：
-     若把 id 直接放在外层，APlayer 会给它加上 .aplayer 类，而后加载的 APlayer.min.css
-     里的 .aplayer{position:relative} 会盖掉 .music-player 的 fixed，播放器就掉到页面底部了 -->
-<div class="music-player is-collapsed">
-  <div id="musicPlayer">🎵 加载中…</div>
-</div>
-<!-- 手机端专用：左下角展开/收回播放器的小按钮，可拖动、拖到边上会缩小吸边（桌面端由 CSS 隐藏）。
-     初始 class 就是「收起」，免得手机端加载时闪一下展开的播放器；桌面端 .is-collapsed 没有样式，等于没加 -->
-<button class="music-toggle" id="musicToggle" type="button" aria-expanded="false" aria-controls="musicPlayer" title="展开播放器">🎵</button>
-<link rel="stylesheet" href="assets/APlayer.min.css?v=20260920c">
-<style>
-  .aplayer .aplayer-info {
-    height: auto !important;
-    min-height: 66px !important;
-  }
-  .aplayer .aplayer-info .aplayer-music {
-    overflow: visible !important;
-    white-space: normal !important;
-    text-overflow: unset !important;
-    height: auto !important;
-    line-height: 1.5 !important;
-    margin-bottom: 8px !important;
-  }
-  .aplayer .aplayer-info .aplayer-music .aplayer-title,
-  .aplayer .aplayer-info .aplayer-music .aplayer-author {
-    white-space: normal !important;
-    display: inline !important;
-  }
-</style>
-<script src="assets/APlayer.min.js?v=20260920c"></script>
-<script src="assets/player.js?v=20260920c"></script>
-<script src="assets/live2d.js?v=20260920c"></script>
+<button class="music-toggle" id="musicToggle" type="button" aria-expanded="false" aria-controls="musicPanel" aria-label="展开音乐播放器" title="展开音乐播放器">🎵</button>
+<script src="assets/live2d.js?v=20260924a"></script>
 </body>
 </html>
