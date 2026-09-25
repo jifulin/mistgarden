@@ -529,6 +529,55 @@ body {
     user-select: none;
   }
   .hitokoto:hover { filter: brightness(1.15); }
+  /* === 逐字歌词：音乐播放时接管一言的位置（assets/lyrics.js） === */
+  /* 一言用的是父级 background-clip:text 渐变，歌词层要自带背景，
+     所以接管时先把父级那层渐变关掉，交给 .hk-lyric 自己画。 */
+  .hitokoto .hk-lyric { display: none; }
+  .hitokoto.is-lyric {
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: inherit;
+    cursor: default;
+  }
+  .hitokoto.is-lyric .hk-text { display: none; }
+  .hitokoto.is-lyric .hk-lyric { display: inline-block; }
+  /* --lrc-p 由 JS 每帧写入（0%~100%），硬边渐变就是「已唱 / 未唱」的分界线，
+     边界扫过文字即卡拉 OK 的逐字填充效果。 */
+  .hk-lyric {
+    --lrc-p: 0%;
+    --lrc-done: #ffd3e1;
+    --lrc-todo: rgba(255, 255, 255, 0.34);
+    max-width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    background-image: linear-gradient(90deg,
+      var(--lrc-done) 0 var(--lrc-p),
+      var(--lrc-todo) var(--lrc-p) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    animation: lrcLineIn 0.32s ease both;
+  }
+  @keyframes lrcLineIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to   { opacity: 1; transform: none; }
+  }
+  /* 白天模式：浅背景下未唱部分要压得住，用深色 */
+  [data-theme="light"] .hitokoto.is-lyric { color: inherit; }
+  [data-theme="light"] .hk-lyric {
+    --lrc-done: #be185d;
+    --lrc-todo: rgba(15, 23, 42, 0.32);
+  }
+  /* 不支持 background-clip:text 的浏览器：整行直接用已唱色，不做填充 */
+  @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hk-lyric { color: var(--lrc-done); background-image: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hk-lyric { animation: none; }
+  }
   /* 白天模式的小字号一言用稳固实色，避免浅背景上渐变文字对比不足。 */
   [data-theme="light"] .hitokoto { color: #075985; background: transparent; }
   [data-theme="light"] .hitokoto.hitokoto-alt { color: #9a3412; }
