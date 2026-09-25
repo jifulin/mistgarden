@@ -404,26 +404,35 @@ body {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
-  /* 列数自适应：data-cols 由 index.html 顶部的 NAV_LINKS 数量算出并写入
-     1~8 → 2 列   9~15 → 3 列   16+ → 4 列   （也可用 NAV_COLUMNS 手动锁定） */
+  /* 列数上限：data-cols 由 index.html 顶部的 NAV_LINKS 数量算出并写入
+     1~8 → 2 列   9~15 → 3 列（9 个即 3×3）   16+ → 4 列（16 个即 4×4）
+     （也可用 NAV_COLUMNS 手动锁定）
+     实际列数还要再看屏幕档位，见文件底部「导航响应式」一节。
+     多出来的列全靠「内容区向两侧扩展」放下，卡片尺寸自始至终不缩。 */
   .link-grid[data-cols="1"] { grid-template-columns: minmax(0, 1fr); }
   .link-grid[data-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .link-grid[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-  .link-grid[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
-  /* 3 列 / 4 列时卡片自动瘦身，避免文字挤成一坨 */
-  .link-grid[data-cols="3"] .link-card,
-  .link-grid[data-cols="4"] .link-card {
-    padding: 12px;
-    gap: 10px;
-    border-radius: 15px;
+  .link-grid[data-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .link-grid[data-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* 内容区向两侧扩展（body[data-nav-cols] 由渲染脚本写入）
+     左右必须留出死区，不能压到两个固定浮层上：
+       看板娘 .live2d-wrap  right: 0，     宽 min(40vw, 380px)
+       播放器               left: 16px，   宽 280px
+     --nav-safe 取 390px（380 + 10 缝隙），内容区两侧各让出这么多。
+
+       max-width = min( 理想宽度 , max( 保底宽度 , 视口 - 死区 × 2 ) )
+
+     · 4 列只在 ≥1920px 出现，1920 - 780 = 1140px 已经够宽，死区永远留得住；
+     · 3 列会下探到 1025px，760px 是保底值，此时死区会被迫变窄，但 3 列本来就不算宽。
+     卡片尺寸不跟着缩：上面的宽度保证每张卡至少 220px，
+     图标仍是 48px、标题 15px、描述两行，和 2 列时完全一致。 */
+  body[data-nav-cols="3"],
+  body[data-nav-cols="4"] { --nav-safe: 390px; }
+  body[data-nav-cols="3"] .container {
+    max-width: min(1040px, max(760px, calc(100vw - var(--nav-safe) * 2)));
   }
-  .link-grid[data-cols="3"] .card-icon { width: 40px; height: 40px; }
-  .link-grid[data-cols="4"] .card-icon { width: 34px; height: 34px; }
-  .link-grid[data-cols="3"] .card-name { font-size: 14px; }
-  .link-grid[data-cols="4"] .card-name { font-size: 13px; margin-bottom: 2px; }
-  .link-grid[data-cols="3"] .card-desc,
-  .link-grid[data-cols="4"] .card-desc { font-size: 11px; -webkit-line-clamp: 1; }
-  .link-grid[data-cols="4"] .arrow { display: none; }
+  body[data-nav-cols="4"] .container {
+    max-width: min(1370px, calc(100vw - var(--nav-safe) * 2));
+  }
   /* 没有配图标时用名称首字/emoji 兜底 */
   .link-card .card-icon.is-text {
     display: flex;
@@ -433,8 +442,6 @@ body {
     line-height: 1;
     color: var(--card-name);
   }
-  .link-grid[data-cols="3"] .card-icon.is-text { font-size: 19px; }
-  .link-grid[data-cols="4"] .card-icon.is-text { font-size: 17px; }
   .link-card {
       background: linear-gradient(160deg, rgba(15,17,30,0.3) 0%, rgba(10,12,20,0.35) 100%);
       border: 1px solid rgba(255,255,255,0.05);
@@ -637,10 +644,30 @@ body {
   }
   
   /* === 响应式 === */
-  @media (max-width: 900px) {
-    /* 平板：4 列降到 3 列 */
-    .link-grid[data-cols="4"] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-    .link-grid[data-cols="4"] .arrow { display: inline; }
+  /* 导航响应式：列数只跟屏幕档位走，卡片尺寸自始至终不变。
+
+       ≥ 1920px        最多 4 列  →  16 个 = 4 × 4
+       1025 ~ 1919px   最多 3 列  →   9 个 = 3 × 3
+       ≤ 1024px        最多 2 列  ←  改造前的老规矩，平板 / 手机一点没动
+       ≤ 420px         单列长条   ←  同上，竖屏手机放不下两列时
+
+     实际列数 = min( 按导航数量算出的列数 , 当前屏幕档位允许的最大列数 )。
+     所以 8 个导航在任何屏幕上都还是老样子的 2 列。
+     下面统一用 body[data-nav-cols=N] .xxx 的写法保持相同优先级，靠书写顺序决定谁生效，
+     别改成 .link-grid[data-cols] 否则优先级会打架。 */
+  @media (max-width: 1919px) {
+    /* 不到 1920px：4 列降为 3 列，容器改用 3 列那条规则 */
+    body[data-nav-cols="4"] .container {
+      max-width: min(1040px, max(760px, calc(100vw - var(--nav-safe) * 2)));
+    }
+    body[data-nav-cols="4"] .link-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 1024px) {
+    /* 平板 / 手机：回到改造前的 2 列，容器还原成 720px */
+    body[data-nav-cols="3"] .container,
+    body[data-nav-cols="4"] .container { max-width: 720px; }
+    body[data-nav-cols="3"] .link-grid,
+    body[data-nav-cols="4"] .link-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 640px) {
     .container {
@@ -650,27 +677,16 @@ body {
     }
     .header h1 { font-size: 24px; }
     .glass-card { padding: 16px 12px; }
-    /* 手机：不管配了几列，统一两列 */
-    .link-grid[data-cols] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .link-grid[data-cols] .link-card { padding: 12px; gap: 10px; }
-    .link-grid[data-cols] .card-icon { width: 40px; height: 40px; }
-    .link-grid[data-cols] .card-name { font-size: 14px; }
-    .link-grid[data-cols] .card-desc { font-size: 11px; -webkit-line-clamp: 2; }
-    .link-grid[data-cols] .arrow { display: none; }
   }
   @media (max-width: 420px) {
     .container { padding-left: 14px; padding-right: 14px; }
     .header { margin-bottom: 16px; }
     .header .desc { font-size: 12px; line-height: 1.6; }
     .widget-bar { margin-bottom: 16px; }
-    /* 窄屏手机：单列 */
-    .link-grid,
-    .link-grid[data-cols] { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-    .link-grid[data-cols] .link-card { min-height: 72px; padding: 12px 14px; }
-    .link-grid[data-cols] .card-icon { width: 48px; height: 48px; }
-    .link-grid[data-cols] .card-name { font-size: 15px; }
-    .link-grid[data-cols] .card-desc { font-size: 12px; }
-    .link-grid[data-cols] .arrow { display: inline; }
+    /* 窄屏手机：和改造前一样，统一单列长条 */
+    .link-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    body[data-nav-cols] .link-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .link-card { min-height: 72px; padding: 12px 14px; }
   }
 
   /* ===== 白天模式覆盖：简洁浅色 ===== */

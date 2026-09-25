@@ -17,7 +17,13 @@
        1~8 个  → 2 列        9~15 个 → 3 列（9 个正好 3×3）
        16 个及以上 → 4 列（16 个正好 4×4）
      想锁死列数就把 NAV_COLUMNS 改成 2、3 或 4。
-     窄屏会自动降级：≤900px 最多 3 列，≤640px 最多 2 列，≤420px 单列。
+     上面算出的是「列数上限」，实际列数还要看屏幕宽度：
+       ≥1920px  最多 4 列 → 16 个就是 4×4
+       ≥1025px  最多 3 列 →  9 个就是 3×3
+       ≤1024px  最多 2 列 ← 平板 / 手机，和改造前完全一样
+       ≤420px   单列长条  ← 同上
+     多出来的列全靠内容区向两侧扩展放下，卡片尺寸一点都不缩；
+     左右会各留 390px 死区，不会压到看板娘和播放器上。
      ══════════════════════════════════════════════════════════════════════════ -->
 <script>
 window.NAV_COLUMNS = 'auto';
@@ -41,7 +47,7 @@ window.NAV_LINKS = [
 <!-- 资源版本号：改完 style.css / player.js / live2d.js 记得把下面几处的 ?v= 一起改
      （站点走 Cloudflare，CSS/JS 边缘缓存 4 小时；不换版本号的话会出现「新 HTML + 旧 CSS」，
       看板娘容器拿不到 position:fixed，整页被顶下去一大块） -->
-<link rel="stylesheet" href="style.css?v=20260926a">
+<link rel="stylesheet" href="style.css?v=20260926e">
 
 </head>
 <body>
@@ -188,6 +194,8 @@ window.NAV_LINKS = [
       var cols = (forced >= 1 && forced <= 4) ? forced : (n >= 16 ? 4 : (n >= 9 ? 3 : 2));
       grid.setAttribute('data-cols', String(cols));
       grid.setAttribute('data-count', String(n));
+      /* 列数同时写到 body 上：CSS 选不到父元素，.container 靠它决定加宽到多少 */
+      document.body.setAttribute('data-nav-cols', String(cols));
     })();
     </script>
   </div>
