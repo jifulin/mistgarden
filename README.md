@@ -21,11 +21,13 @@
 - 🕐 **实时时钟**：显示当前日期和时间
 - ⏱️ **运行计时**：页脚显示网站已经运行了多久
 - 🎵 **背景音乐**：APlayer 播放器，用户同意后才加载播放器和音源，不同意就一个音乐请求都不发
+- 🎶 **歌单切换**：播放器顶部可以选默认歌单、网易云热歌榜、抖音热门榜，或者自定义歌单（网易云 / QQ 音乐 / 酷狗，填 ID 或分享链接）；QQ、酷狗的歌会自动匹配网易云的完整音源，选择会记住
 - 🌸 **樱花和粒子特效**，切到后台时暂停
 - 📱 **响应式适配**：支持手机、平板和桌面端
 
-### Live2D 看板娘（仅电脑端）
+### Live2D 看板娘（电脑端 / 平板）
 
+- 📱 **平板适配**：触摸屏没有悬停，点 👕 / ⓘ 开关菜单，点看板娘身上弹出音乐菜单，点别处收起；手机（含横屏）不加载
 - 🎀 **在线模型**：模型来自开源项目 [fghrsh/live2d_api](https://github.com/fghrsh/live2d_api)，通过 jsDelivr CDN 加载，仓库里不放模型文件。现在有 7 个角色、199 套服装，第一次访问默认是 Tia · maid black
 - 🧰 **仿原版菜单**：参照 [live2d-widget](https://github.com/stevenjoezhang/live2d-widget)，有文字气泡和竖排工具栏，工具栏里是一言、切换角色、换装、拍照、主题、随机背景、关于、退出
 - 👗 **换装**：鼠标停在 👕 上，可以选上一件、下一件、随机，或者输入序号直接换
@@ -61,7 +63,7 @@ photos/                    图片资源
 | 想改什么 | 在哪里改 |
 | --- | --- |
 | 随机背景图 API | `index.html` 里的 `BG_API`（桌面）和 `BG_API_MOBILE`（手机） |
-| 歌单 | `assets/player.js` 里的 `PLAYLIST_ID` |
+| 歌单（默认歌单 / 榜单） | `assets/player.js` 里的 `PRESETS`（`default` 是默认歌单，ID 都是网易云歌单 ID） |
 | 网站运行起始时间 | `index.html` 里的 `startTime` |
 | 默认看板娘 / 服装 | `assets/live2d-models.json` 里的 `default: { c: 角色下标, o: 服装下标 }` |
 | 看板娘台词 | `assets/live2d.js` 里的 `HOVER`、`CLICK` 和 `welcomeMessage()` |

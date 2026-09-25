@@ -8,7 +8,9 @@
  * 模型和运行时都走网上的开源资源，仓库里不放模型文件：
  *   - 模型：fghrsh/live2d_api（jsDelivr CDN，锁定到某个 commit）
  *   - 运行时：Cubism 2 core（live2d.min.js）+ PIXI v6 + pixi-live2d-display 的 cubism2 渲染器
- * 电脑端打开页面后会在空闲时自动加载；手机端（≤640px）不加载。
+ * 电脑端 / 平板打开页面后会在空闲时自动加载；手机端（≤640px，或短边 < 600px 的触摸屏，含横屏）不加载。
+ * 触摸屏（平板）没有悬停：👕 / ⓘ 改成点一下开关菜单，人物身上盖一块透明触摸区，点一下弹音乐菜单；
+ * 点气泡和工具栏以外的地方收起菜单。接了鼠标的平板按每次事件的 pointerType 走鼠标逻辑。
  *
  * 角色 / 服装清单在 assets/live2d-models.json：
  *   default = { c, o }：首次访问的默认角色 / 服装下标
@@ -64,7 +66,22 @@
   }
   function pick(a) { return Array.isArray(a) ? a[Math.floor(Math.random() * a.length)] : a; }
   function cur() { return chars[ci] || { name: '', outfits: [] }; }
-  function isMobile() { return window.innerWidth <= MOBILE_W; }
+  // 触摸屏：主要输入没有悬停能力（平板 / 手机）
+  var TOUCH_MQ = window.matchMedia ? window.matchMedia('(hover: none), (pointer: coarse)') : null;
+  function isTouchUI() { return !!(TOUCH_MQ && TOUCH_MQ.matches); }
+  // 手机：短边 < 600px 的触摸屏。横屏时宽度会超过 640，只看宽度会把手机当成平板
+  function isPhone() { return isTouchUI() && Math.min(screen.width, screen.height) < 600; }
+  function isMobile() { return window.innerWidth <= MOBILE_W || isPhone(); }
+  // 最近一次指针来自手指还是鼠标：混合设备（iPad + 触控板）按实际操作切换。
+  // 手指点一下时浏览器会补发 mouseover / mouseenter / mousemove / focus 这些兼容事件，
+  // pointerover / pointerdown 总是先于它们，所以兼容事件到来时这里已经是 'touch'
+  var lastPointer = isTouchUI() ? 'touch' : 'mouse';
+  ['pointerover', 'pointerdown', 'pointermove'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { if (e.pointerType) lastPointer = e.pointerType; }, true);
+  });
+  function viaTouch() { return lastPointer === 'touch' || lastPointer === 'pen'; }
+  // 只给鼠标用的悬停处理：手指点出来的兼容事件直接忽略
+  function mouseOnly(fn) { return function (e) { if (!viaTouch()) return fn(e); }; }
 
   /* ======================= 文字气泡 ======================= */
   // 气泡里可以带选项按钮（choices = [{ label, primary?, onSelect }]）。
@@ -161,6 +178,8 @@
     tipsEl.dataset.kind = '';
     renderTip(text, choices);
     tipExpired = false;
+    // 触摸屏上没法「停在气泡上」让菜单别收，所以带选项的菜单多留一会儿（点外面会提前收起）
+    if (menuOpen && viaTouch()) timeout = Math.max(timeout || 0, TOUCH_MENU_MS);
     tipTimer = setTimeout(function () {
       if (hoverKeep) { tipExpired = true; return; }  // 鼠标还停在气泡上，先别收，等移开再说
       endMessage();
@@ -176,7 +195,7 @@
   // 鼠标停在带选项的气泡上时不自动收起，移开后稍等再收
   // 带选项的菜单（换装 / 关于）：鼠标离开按钮和气泡后很快收起，不挡后面其它图标的提示；
   // 从按钮移到气泡上点选项的路上不会收（有一小段宽限）
-  var menuOpen = false, menuTimer = 0, MENU_GRACE = 600;
+  var menuOpen = false, menuTimer = 0, MENU_GRACE = 600, TOUCH_MENU_MS = 8000;
   function menuLeave() {
     if (!menuOpen) return;
     clearTimeout(menuTimer);
@@ -185,14 +204,14 @@
     }, MENU_GRACE);
   }
   function menuStay() { clearTimeout(menuTimer); }
-  tipsEl.addEventListener('mouseenter', function () { hoverKeep = true; menuStay(); });
+  tipsEl.addEventListener('mouseenter', mouseOnly(function () { hoverKeep = true; menuStay(); }));
   // 只有消息本该结束了才在移开后收起；气泡内容变化导致的「移出」不会提前关掉新消息
-  tipsEl.addEventListener('mouseleave', function () {
+  tipsEl.addEventListener('mouseleave', mouseOnly(function () {
     hoverKeep = false;
     var focused = document.activeElement;
     if (menuOpen && !(focused && tipsEl.contains(focused) && focused.tagName === 'INPUT')) menuLeave();
     if (tipExpired && tipPriority >= 0) { tipExpired = false; clearTimeout(tipTimer); tipTimer = setTimeout(endMessage, 1500); }
-  });
+  }));
 
   function welcomeMessage() {
     var h = new Date().getHours();
@@ -252,6 +271,8 @@
   }
   var lastHover = null;
   document.addEventListener('mouseover', function (e) {
+    // 手指点一下也会补发 mouseover：那时再说「要换个主题吗？」就晚了，还会顶掉操作反馈，所以只对鼠标说
+    if (viaTouch()) return;
     // 菜单开着时移到别的工具图标上：直接换成那个图标的提示
     var tool = e.target.closest && e.target.closest('#waifuTool button[data-act]');
     if (tool && menuOpen && tool.dataset.act !== 'outfit' && tool.dataset.act !== 'info') endMessage();
@@ -272,7 +293,14 @@
     showMessage('你都复制了些什么呀，转载要记得加上出处哦！', 6000, 9);
   });
   document.addEventListener('visibilitychange', function () {
-    if (app && on) { if (document.hidden) app.stop(); else app.start(); }
+    if (app && on) {
+      if (document.hidden) app.stop();
+      else {
+        app.start();
+        // 后台期间换的装（比如在衣柜页里挑的）还没校正：等动作 / 物理跑几帧再量
+        if (layoutPending) scheduleLayout(400);
+      }
+    }
     if (!document.hidden) showMessage('哇，你终于回来了～', 6000, 9);
   });
 
@@ -365,7 +393,7 @@
     scheduleLayout();
   }
 
-  var layoutTimer = 0;
+  var layoutTimer = 0, layoutPending = false, LAYOUT_RETRIES = 15;
   function scheduleLayout(delay) {
     clearTimeout(layoutTimer);
     layoutTimer = setTimeout(layoutOverlay, delay == null ? 250 : delay);  // 等一两帧，让动作 / 物理先稳定
@@ -411,6 +439,11 @@
 
   function layoutOverlay() {
     if (!app || !model || !on) return;
+    // 页面在后台时（比如正在衣柜页里挑衣服）浏览器暂停了动画帧，模型一帧动作 / 物理都没跑，
+    // 这时量到的是翅膀、头发都收着的静止姿势，按它缩放 / 居中，回到前台一动起来边缘就被画布裁掉。
+    // 所以后台时先不校正（模型保持隐藏），切回前台后由 visibilitychange 重新安排。
+    if (document.hidden) { layoutPending = true; return; }
+    layoutPending = false;
     var w = canvas.clientWidth, h = canvas.clientHeight;
     var box = measure(w, h);
     var availW = w - TOOL_W;
@@ -432,9 +465,17 @@
       scheduleLayout(60);
       return;
     }
+    // 校正还没做完却没量到人物（离屏测量偶尔拿到空白帧，页面刚从后台切回来时尤其常见，
+    // 比如在衣柜页选完衣服回到主页）：以前这里直接放弃校正、按模型声明的尺寸显示，
+    // 人物会明显变大、左边翅膀被画布裁掉。现在先保持隐藏，隔一会儿再量；实在量不到才按原尺寸兜底。
+    if (!box && pass < 2 && (model.__tries = (model.__tries || 0) + 1) <= LAYOUT_RETRIES) {
+      scheduleLayout(300);
+      return;
+    }
     model.alpha = 1;                                  // 校正完成再显示，避免看到人物跳动
     if (!box) return;
-    modelBox = box;                                   // 记下人物外框，鼠标悬停检测用
+    modelBox = box;                                   // 记下人物外框，鼠标悬停检测 / 触摸区定位用
+    placeTouchZone();
     // 气泡：底边压在头顶上，水平居中对齐头部，不超出容器
     tipsEl.style.top = 'auto';
     tipsEl.style.bottom = Math.max(0, h - box.top - TIP_OVERLAP) + 'px';
@@ -661,9 +702,56 @@
     }
   }
   document.addEventListener('mousemove', function (e) {
+    if (viaTouch()) return;                         // 手指点出来的兼容 mousemove 不算「摸」，触摸屏走下面的触摸区
     lastXY = [e.clientX, e.clientY];
     if (!moveRaf) moveRaf = requestAnimationFrame(onModelMove);
   }, { passive: true });
+
+  /* ---- 触摸屏：人物身上盖一块透明触摸区，点一下弹 / 收音乐菜单 ---- */
+  // 模型区域本身不接收点击（不挡后面的页面），触摸屏又没有悬停，所以单独放一块可点的区域。
+  // 只盖人物中间（头到腰、左右各收 20%），尽量少挡后面的页面；接了鼠标的设备不显示。
+  var touchZone = document.createElement('div');
+  touchZone.className = 'waifu-touch-zone';
+  touchZone.hidden = true;
+  touchZone.setAttribute('aria-hidden', 'true');
+  wrap.insertBefore(touchZone, toolEl);
+  function placeTouchZone() {
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    var show = on && !!model && !!modelBox && isTouchUI() && w > 0 && h > 0;
+    touchZone.hidden = !show;
+    if (!show) return;
+    var bw = modelBox.right - modelBox.left;
+    var top = Math.max(0, modelBox.top);
+    var bottom = Math.min(h, top + (Math.min(modelBox.bottom, h) - top) * 0.7);
+    var left = Math.max(0, modelBox.left + bw * 0.2);
+    var right = Math.min(w - TOOL_W, modelBox.right - bw * 0.2);
+    if (right - left < 24 || bottom - top < 24) { touchZone.hidden = true; return; }
+    touchZone.style.left = left + 'px';
+    touchZone.style.top = top + 'px';
+    touchZone.style.width = (right - left) + 'px';
+    touchZone.style.height = (bottom - top) + 'px';
+  }
+  touchZone.addEventListener('click', function () {
+    if (menuOpen && musicMenuOpen) { endMessage(); return; }   // 再点一下就收起
+    showMusicMenu();
+    musicMenuOpen = menuOpen;
+    if (menuOpen) tipsEl.dataset.kind = 'music';
+  });
+  // 接上 / 拔掉鼠标时（主要输入方式变了）重新决定显不显示触摸区
+  if (TOUCH_MQ) {
+    var onInputChange = function () { placeTouchZone(); syncUI(); };
+    if (TOUCH_MQ.addEventListener) TOUCH_MQ.addEventListener('change', onInputChange);
+    else if (TOUCH_MQ.addListener) TOUCH_MQ.addListener(onInputChange);
+  }
+  // 触摸屏：点气泡、触摸区和 👕 / ⓘ 以外的地方就收起菜单（常驻的音乐询问不受影响，endMessage 会还原它）
+  document.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse' || !menuOpen) return;
+    var t = e.target;
+    if (tipsEl.contains(t) || touchZone.contains(t)) return;
+    if (t.closest && t.closest('#waifuTool [data-act="outfit"], #waifuTool [data-act="info"]')) return;
+    endMessage();
+  }, true);
+
   // 切歌时如果看板娘在、又没别的事，报一下歌名
   document.addEventListener('mistgarden:music-ready', function () {
     var ap = musicApi();
@@ -681,9 +769,9 @@
 
   var outfitBtn = toolEl.querySelector('[data-act="outfit"]');
   if (outfitBtn) {
-    outfitBtn.addEventListener('mouseenter', showOutfitMenu);
-    outfitBtn.addEventListener('mouseleave', menuLeave);
-    outfitBtn.addEventListener('focus', showOutfitMenu);
+    outfitBtn.addEventListener('mouseenter', mouseOnly(showOutfitMenu));
+    outfitBtn.addEventListener('mouseleave', mouseOnly(menuLeave));
+    outfitBtn.addEventListener('focus', mouseOnly(showOutfitMenu));   // 键盘聚焦照常弹；手指点的由 click 处理
   }
 
   /* ---- 首访音乐询问：由页面脚本调用，看板娘在场就常驻在气泡里 ---- */
@@ -725,22 +813,22 @@
   }
   var infoBtn = toolEl.querySelector('[data-act="info"]');
   if (infoBtn) {
-    infoBtn.addEventListener('mouseenter', showAboutMenu);
-    infoBtn.addEventListener('mouseleave', menuLeave);
-    infoBtn.addEventListener('focus', showAboutMenu);
+    infoBtn.addEventListener('mouseenter', mouseOnly(showAboutMenu));
+    infoBtn.addEventListener('mouseleave', mouseOnly(menuLeave));
+    infoBtn.addEventListener('focus', mouseOnly(showAboutMenu));
   }
 
   // 兜底：鼠标在换装 / 关于按钮上移动时，如果气泡是空的或还停在音乐菜单，就补弹对应菜单。
   // mouseenter 偶尔会被别的消息（音乐菜单、切歌提示、宽限计时）抢掉，这里保证「指着按钮就一定有气泡」
   [[outfitBtn, 'outfit', showOutfitMenu], [infoBtn, 'about', showAboutMenu]].forEach(function (x) {
     if (!x[0]) return;
-    x[0].addEventListener('mousemove', function () {
+    x[0].addEventListener('mousemove', mouseOnly(function () {
       clearTimeout(dwellTimer); overModel = false;   // 指着按钮时不算摸看板娘
       var active = tipsEl.classList.contains('waifu-tips-active');
       var kind = tipsEl.dataset.kind || '';
       if (pinned || kind === x[1]) { menuStay(); return; }
       if (!active || kind === 'music') x[2]();
-    });
+    }));
   });
 
   /* ---- 和衣柜页互通：衣柜点「穿上」→ 主页换装；主页换装 → 衣柜高亮当前这件 ---- */
@@ -785,7 +873,15 @@
       showMessage('正在请 ' + cur().name + ' 过来…', 8000, 10);
       run(loadModel, function () { return cur().msg || cur().name; });
     },
-    outfit: function () { changeOutfit(1); },
+    outfit: function () {
+      // 触摸屏没有悬停：点 👕 只开关换装菜单，不直接换下一件（鼠标照旧：悬停出菜单，点击换下一件）
+      if (viaTouch()) {
+        if (menuOpen && tipsEl.dataset.kind === 'outfit') endMessage();
+        else showOutfitMenu();
+        return;
+      }
+      changeOutfit(1);
+    },
     photo: function () {
       if (!app || !model) return;
       showMessage('照好了嘛，是不是很可爱呢？', 6000, 9);
@@ -810,7 +906,10 @@
       syncUI();
       showMessage(bgToggle.checked ? '随机背景已开启，隔一会儿就换一张～' : '随机背景已关闭，换回固定背景啦。', 4000, 10);
     },
-    info: showAboutMenu,
+    info: function () {
+      if (viaTouch() && menuOpen && tipsEl.dataset.kind === 'about') { endMessage(); return; }   // 触摸屏再点一下收起
+      showAboutMenu();
+    },
     quit: function () {
       showMessage('愿你有一天能与重要的人重逢。', 2000, 11);
       setTimeout(function () { hide(true); }, 1200);

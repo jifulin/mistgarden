@@ -750,6 +750,115 @@ body {
     white-space: normal !important;
     display: inline !important;
   }
+  /* === 播放器顶部的歌单选择（assets/player.js 生成）：点「🎶 歌单」展开，播放器底部固定，菜单往上长 === */
+  .pl-picker { margin: 0 0 3px; font-size: 13px; color: var(--btn-text); }
+  .pl-current {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 32px;
+    padding: 5px 10px;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--btn-border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+  }
+  .pl-current:hover,
+  .pl-current:focus-visible,
+  .pl-picker.is-open .pl-current { background: rgba(255,143,171,0.16); border-color: rgba(255,143,171,0.55); outline: none; }
+  .pl-name { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 500; }
+  .pl-count { flex: none; font-size: 12px; opacity: .7; }
+  .pl-caret { flex: none; font-size: 11px; opacity: .8; transition: transform .2s; }
+  .pl-picker.is-open .pl-caret { transform: rotate(180deg); }
+  .pl-picker.is-loading .pl-name { opacity: .75; }
+  .pl-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 4px;
+    padding: 4px;
+    background: rgba(0,0,0,0.12);
+    border: 1px solid var(--btn-border);
+    border-radius: 9px;
+  }
+  .pl-menu[hidden] { display: none; }
+  .pl-opt {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    width: 100%;
+    padding: 6px 10px 6px 26px;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+  }
+  .pl-opt::before {                    /* 单选圆点 */
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 11px;
+    width: 9px;
+    height: 9px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    opacity: .55;
+    box-sizing: border-box;
+  }
+  .pl-opt[aria-checked="true"] { background: rgba(255,143,171,0.16); border-color: rgba(255,143,171,0.45); }
+  .pl-opt[aria-checked="true"]::before { background: #ff8fab; border-color: #ff8fab; opacity: 1; }
+  .pl-opt:not(:disabled):hover,
+  .pl-opt:focus-visible { background: rgba(255,255,255,0.08); outline: none; }
+  .pl-opt:disabled { cursor: wait; }
+  .pl-opt.is-loading .pl-opt-label::after { content: ' · 加载中…'; font-weight: 400; opacity: .7; }
+  .pl-opt-label { font-weight: 500; }
+  .pl-opt-desc { font-size: 11.5px; line-height: 1.4; opacity: .68; overflow-wrap: anywhere; }
+  .pl-form { display: flex; gap: 4px; padding: 0 2px 2px 26px; }
+  .pl-platform,
+  .pl-input,
+  .pl-go {
+    min-width: 0;
+    height: 30px;
+    padding: 0 8px;
+    font: inherit;
+    font-size: 12.5px;
+    color: inherit;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--btn-border);
+    border-radius: 7px;
+  }
+  .pl-platform { flex: none; padding-right: 4px; cursor: pointer; }
+  .pl-platform option { color: #1f2937; background: #fff; }
+  .pl-input { flex: 1 1 auto; }
+  .pl-input::placeholder { color: inherit; opacity: .55; }
+  .pl-platform:focus-visible,
+  .pl-input:focus { outline: 2px solid rgba(255,143,171,0.6); outline-offset: 0; }
+  .pl-go { flex: none; color: #fff; background: #ff8fab; border-color: #ff8fab; cursor: pointer; }
+  .pl-go:hover:not(:disabled) { background: #f57396; }
+  .pl-go:disabled { opacity: .65; cursor: wait; }
+  .pl-msg { margin: 0; padding: 0 4px 0 28px; font-size: 11.5px; line-height: 1.45; opacity: .8; }
+  .pl-msg:empty { display: none; }
+  .pl-msg.is-error { color: #fb7185; opacity: 1; }
+  [data-theme="light"] .pl-current { background: rgba(255,255,255,0.45); }
+  [data-theme="light"] .pl-menu { background: rgba(255,255,255,0.35); }
+  [data-theme="light"] .pl-platform,
+  [data-theme="light"] .pl-input { background: rgba(255,255,255,0.7); }
+  [data-theme="light"] .pl-msg.is-error { color: #e11d48; }
+  @media (max-width: 640px) {
+    .pl-platform, .pl-input, .pl-go { height: 34px; font-size: 16px; }   /* iOS 输入框字号 < 16px 聚焦会自动放大页面 */
+    .pl-opt { padding-top: 8px; padding-bottom: 8px; }
+    .pl-opt::before { top: 13px; }
+  }
   /* 歌词背景透明 */
   .aplayer .aplayer-lrc {
     background: transparent !important;
@@ -912,6 +1021,33 @@ body {
   @media (max-width: 640px) {
     .live2d-wrap,
     .waifu-toggle { display: none; }
+  }
+  /* 触摸屏（平板）：人物身上的透明触摸区，点一下弹音乐菜单；位置由 live2d.js 按人物外框计算 */
+  .waifu-tips,
+  .waifu-tool { z-index: 2; }            /* 气泡、工具栏压在触摸区上面 */
+  .waifu-touch-zone {
+    position: absolute;
+    z-index: 1;
+    background: transparent;
+    cursor: pointer;                   /* iOS Safari 只给「可点」的元素派发 click */
+    pointer-events: auto;
+    touch-action: manipulation;        /* 去掉双击缩放带来的点击延迟，照样能滑动页面 */
+    -webkit-tap-highlight-color: transparent;
+  }
+  .waifu-touch-zone[hidden] { display: none; }
+  /* 触摸屏没有悬停：工具栏常亮、按钮加大到手指好点的尺寸，召回标签一直露出来 */
+  @media (hover: none), (pointer: coarse) {
+    .waifu-tool { opacity: 1; gap: 2px; }
+    .waifu-tool button { width: 40px; height: 40px; -webkit-tap-highlight-color: transparent; }
+    .waifu-tool svg { width: 26px; height: 26px; }
+    /* 手指点过后 :hover 会一直「粘」着，改成只在按下时变色 */
+    .waifu-tool button:hover svg { fill: #7b8c9d; }
+    .waifu-tool button:active svg { fill: #0684bd; }
+    .waifu-tips { width: min(280px, 36vw); }
+    .waifu-choice { min-height: 36px; padding: 4px 12px; }
+    .waifu-number input { min-height: 36px; font-size: 16px; }   /* iOS 输入框字号 < 16px 聚焦时会自动放大页面 */
+    .waifu-toggle.waifu-toggle-active,
+    .waifu-toggle.waifu-toggle-active:hover { margin-right: -20px; }
   }
 
   /* === 首访音乐询问：原生 dialog 位于顶层，未同意时音乐资源保持未加载 === */
