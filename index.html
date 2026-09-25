@@ -3,13 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     ★ 导航配置区 ★  想改导航，只改这一块就够了，下面的代码一律不用动
+
+     每行一个网站： { name: '名称', desc: '描述', url: '网址', icon: '图标' }
+       · icon  可以填图片网址，也可以直接填 emoji（如 '🎵'）；留空就显示名称首字
+       · desc  可以省略
+       · 想在当前标签页打开，给那一行补一个  newTab: false
+     删一行 = 少一个卡片，复制一行 = 多一个卡片，顺序就是显示顺序。
+
+     列数自动适配（NAV_COLUMNS = 'auto' 时）：
+       1~8 个  → 2 列        9~15 个 → 3 列（9 个正好 3×3）
+       16 个及以上 → 4 列（16 个正好 4×4）
+     想锁死列数就把 NAV_COLUMNS 改成 2、3 或 4。
+     窄屏会自动降级：≤900px 最多 3 列，≤640px 最多 2 列，≤420px 单列。
+     ══════════════════════════════════════════════════════════════════════════ -->
+<script>
+window.NAV_COLUMNS = 'auto';
+
+window.NAV_LINKS = [
+  { name: '主页',         desc: '雾光庭院主页',  url: 'https://wgty.top',            icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻413.jpg' },
+  { name: '博客',         desc: '个人博客站点',  url: 'https://blog.wgty.top',       icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻1048.jpg' },
+  { name: '🧲 查询',      desc: '资源查询工具',  url: 'https://whatslink.info/',     icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻1014.jpg' },
+  { name: '网盘',         desc: '云端存储',      url: 'https://pan.wgty.top',        icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻1086.jpg' },
+  { name: '短网址生成器', desc: 'URL 缩短工具',  url: 'https://wgty.top',            icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻575.jpg' },
+  { name: '免费API',      desc: '在线 API 接口', url: 'https://wgty.top',            icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻566.jpeg' },
+  { name: '图床',         desc: '图片托管服务',  url: 'https://image.wgty.top',      icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻748.jpg' },
+  { name: '画廊',         desc: '图片画廊',      url: 'https://wgty.top',            icon: 'https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻216.jpg' }
+];
+</script>
+<!-- ════════════════════ 导航配置到此结束，以下无需改动 ════════════════════ -->
+
 <title>雾光庭院</title>
 <link rel="icon" type="image/png" href="https://p.qlogo.cn/gh/741215938/741215938/640">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <!-- 资源版本号：改完 style.css / player.js / live2d.js 记得把下面几处的 ?v= 一起改
      （站点走 Cloudflare，CSS/JS 边缘缓存 4 小时；不换版本号的话会出现「新 HTML + 旧 CSS」，
       看板娘容器拿不到 position:fixed，整页被顶下去一大块） -->
-<link rel="stylesheet" href="style.css?v=20260925q">
+<link rel="stylesheet" href="style.css?v=20260926a">
 
 </head>
 <body>
@@ -86,48 +118,78 @@
   
   <!-- 导航内容 -->
   <div class="tab-content active" id="tab-nav" role="tabpanel" aria-labelledby="tabNav" tabindex="0">
-    <nav class="link-grid" aria-label="常用站点">
-      <a href="https://wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻413.jpg" alt=""></div>
-        <div class="card-info"><div class="card-name">主页</div><div class="card-desc">雾光庭院主页</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://blog.wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻1048.jpg" alt=""></div>
-        <div class="card-info"><div class="card-name">博客</div><div class="card-desc">个人博客站点</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://whatslink.info/" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻1014.jpg" alt=""></div>
-        <div class="card-info"><div class="card-name">🧲 查询</div><div class="card-desc">资源查询工具</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://pan.wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻1086.jpg" alt=""></div>
-        <div class="card-info"><div class="card-name">网盘</div><div class="card-desc">云端存储</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻575.jpg" alt=""></div>
-        <div class="card-info"><div class="card-name">短网址生成器</div><div class="card-desc">URL 缩短工具</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻566.jpeg" alt=""></div>
-        <div class="card-info"><div class="card-name">免费API</div><div class="card-desc">在线 API 接口</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://image.wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻748.jpg" alt=""></div>
-        <div class="card-info"><div class="card-name">图床</div><div class="card-desc">图片托管服务</div></div>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://wgty.top" class="link-card" target="_blank" rel="noopener noreferrer">
-        <div class="card-icon"><img src="https://cdn.jsdmirror.com/gh/lqay-cn/cdn@main/img/zx/f/真寻216.jpg" alt=""></div>
-        <div class="card-info"><div class="card-name">画廊</div><div class="card-desc">图片画廊</div></div>
-        <span class="arrow">→</span>
-      </a>
-    </nav>
+    <!-- 卡片由页头 NAV_LINKS 渲染生成，这里保持空即可 -->
+    <nav class="link-grid" id="linkGrid" aria-label="常用站点" data-cols="2"></nav>
+    <script>
+    /* 导航渲染：读取 window.NAV_LINKS 生成卡片，并按数量决定列数。
+       全部走 DOM API，配置里的文字不会被当成 HTML 解析。 */
+    (function () {
+      var grid = document.getElementById('linkGrid');
+      if (!grid) return;
+
+      var list = Array.isArray(window.NAV_LINKS) ? window.NAV_LINKS : [];
+      var frag = document.createDocumentFragment();
+
+      list.forEach(function (item) {
+        if (!item || !item.name && !item.url) return;
+
+        var a = document.createElement('a');
+        a.className = 'link-card';
+        a.href = item.url || '#';
+        if (item.newTab !== false) {
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+        }
+
+        var iconBox = document.createElement('div');
+        iconBox.className = 'card-icon';
+        var icon = item.icon || '';
+        if (/^(https?:|data:|\/|\.{1,2}\/)/i.test(icon)) {
+          var img = document.createElement('img');
+          img.src = icon;
+          img.alt = '';
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          iconBox.appendChild(img);
+        } else {
+          iconBox.classList.add('is-text');
+          iconBox.textContent = icon || (item.name || '?').trim().charAt(0);
+        }
+
+        var info = document.createElement('div');
+        info.className = 'card-info';
+        var nameEl = document.createElement('div');
+        nameEl.className = 'card-name';
+        nameEl.textContent = item.name || '';
+        info.appendChild(nameEl);
+        if (item.desc) {
+          var descEl = document.createElement('div');
+          descEl.className = 'card-desc';
+          descEl.textContent = item.desc;
+          info.appendChild(descEl);
+        }
+
+        var arrow = document.createElement('span');
+        arrow.className = 'arrow';
+        arrow.textContent = '→';
+
+        a.appendChild(iconBox);
+        a.appendChild(info);
+        a.appendChild(arrow);
+        frag.appendChild(a);
+      });
+
+      grid.textContent = '';
+      grid.appendChild(frag);
+
+      /* 列数：1~8 → 2 列，9~15 → 3 列，16+ → 4 列；NAV_COLUMNS 可手动锁定 */
+      var n = grid.children.length;
+      var forced = parseInt(window.NAV_COLUMNS, 10);
+      var cols = (forced >= 1 && forced <= 4) ? forced : (n >= 16 ? 4 : (n >= 9 ? 3 : 2));
+      grid.setAttribute('data-cols', String(cols));
+      grid.setAttribute('data-count', String(n));
+    })();
+    </script>
   </div>
   
   <!-- 联系内容 -->
