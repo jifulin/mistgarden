@@ -9,7 +9,7 @@
 <!-- 资源版本号：改完 style.css / player.js / live2d.js 记得把下面几处的 ?v= 一起改
      （站点走 Cloudflare，CSS/JS 边缘缓存 4 小时；不换版本号的话会出现「新 HTML + 旧 CSS」，
       看板娘容器拿不到 position:fixed，整页被顶下去一大块） -->
-<link rel="stylesheet" href="style.css?v=20260925k">
+<link rel="stylesheet" href="style.css?v=20260925l">
 
 </head>
 <body>
@@ -420,7 +420,7 @@
       });
       musicAssetsPromise = styleReady
         .then(() => window.APlayer ? null : loadScript('assets/APlayer.min.js?v=20260920c'))
-        .then(() => loadScript('assets/player.js?v=20260925k'))
+        .then(() => loadScript('assets/player.js?v=20260925l'))
         .catch(error => {
           console.warn('[music] 加载失败：', error);
           slot.textContent = '🎵 加载失败，收起后可重试';
@@ -857,6 +857,6 @@
   <div id="musicPlayer" aria-live="polite">🎵 点击展开以加载音乐</div>
 </div>
 <button class="music-toggle" id="musicToggle" type="button" aria-expanded="false" aria-controls="musicPanel" aria-label="展开音乐播放器" title="展开音乐播放器">🎵</button>
-<script src="assets/live2d.js?v=20260925k"></script>
+<script src="assets/live2d.js?v=20260925l"></script>
 </body>
 </html>

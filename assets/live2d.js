@@ -257,7 +257,8 @@
     if (!t) { lastHover = null; return; }
     if (lastHover === t) return;
     lastHover = t;
-    // 工具图标的提示总是优先（盖过换装菜单、「换装中…」等），而且只停留 3 秒；页面元素的闲聊优先级低
+    // 工具图标的提示、换装 / 关于菜单、摸看板娘出来的音乐菜单同为最高优先级 13：
+    // 后来的总能顶掉先来的，互相不会挡（以前菜单是 12，路过别的图标出现的 13 提示会把菜单挡掉）
     if (tool) showMessage(t, 3000, 13);
     else showMessage(t, 4000, 8);
   });
@@ -573,7 +574,7 @@
       '喜欢换装 PLAY 吗？现在穿的是' + outfitLabel(),
       '这次要扮演什么呢？现在是' + outfitLabel(),
       '变装！要换哪一件？当前' + outfitLabel()
-    ], 2500, 12, outfitChoices());
+    ], 2500, 13, outfitChoices());
   }
   // step: 1 下一件，-1 上一件，0 随机（不会随到当前这件）；step 为 null 时直接换到 target 号
   function changeOutfit(step, target) {
@@ -603,18 +604,18 @@
     var ap = musicApi(), ctl = musicCtl();
     if (!ctl) return;
     if (!ctl.consented) {
-      showMessage(['要听点音乐吗？我可以帮你放哦～', '安安静静的也不错，不过要不要来首歌？'], 3000, 12, [
+      showMessage(['要听点音乐吗？我可以帮你放哦～', '安安静静的也不错，不过要不要来首歌？'], 3000, 13, [
         { label: '▶ 播放音乐', primary: true, onSelect: function () {
           ctl.start();
-          showMessage('好耶～音乐马上就来！', 3000, 12);
+          showMessage('好耶～音乐马上就来！', 3000, 13);
         } },
-        { label: '不用了', onSelect: function () { showMessage('好的，想听的时候再摸摸我～', 2500, 12); } }
+        { label: '不用了', onSelect: function () { showMessage('好的，想听的时候再摸摸我～', 2500, 13); } }
       ]);
       return;
     }
-    if (!ap) { showMessage('音乐还在加载中，稍等一下下～', 2500, 12); return; }
+    if (!ap) { showMessage('音乐还在加载中，稍等一下下～', 2500, 13); return; }
     var paused = ap.audio.paused;
-    showMessage((paused ? '音乐暂停中：' : '正在播放：') + trackInfo(ap), 3000, 12, [
+    showMessage((paused ? '音乐暂停中：' : '正在播放：') + trackInfo(ap), 3000, 13, [
       { label: '⏮ 上一首', onSelect: function () { ap.skipBack(); ap.play(); refreshMusicMenu(); } },
       { label: paused ? '▶ 继续' : '⏸ 暂停', primary: true, onSelect: function () { ap.toggle(); refreshMusicMenu(); } },
       { label: '下一首 ⏭', onSelect: function () { ap.skipForward(); ap.play(); refreshMusicMenu(); } },
@@ -712,7 +713,7 @@
       '想要知道更多关于我的事么？我们一共有 ' + chars.length + ' 位、' + total + ' 套衣服哦～',
       '衣柜里有我们所有的衣服，要去看看吗？',
       '这里记录着我搬家的历史呢。'
-    ], 3000, 12, [
+    ], 3000, 13, [
       { label: '👗 打开衣柜', primary: true, onSelect: openWardrobe },
       { label: '模型来源', title: ABOUT_URL, onSelect: function () { window.open(ABOUT_URL, '_blank', 'noopener'); } }
     ]);
