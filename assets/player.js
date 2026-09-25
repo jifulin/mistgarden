@@ -238,6 +238,7 @@
       try { ap.volume(VOLUME); } catch (e) {}
       safePlay(true);
     }
+    window.__mistMusic = ap;         // 给看板娘用：鼠标停在她身上时可以切歌 / 暂停
     document.dispatchEvent(new Event('mistgarden:music-ready'));
   }
 

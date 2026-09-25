@@ -20,6 +20,7 @@
  * 鼠标停在 👕 上，气泡里会出现「上一件 / 随机 / 下一件 / 输入序号」。
  * 鼠标停在 ⓘ 上可以打开衣柜页 wardrobe.html：两个页面用 BroadcastChannel 互通，
  * 在衣柜里点哪件，主页的看板娘就换上哪件；主页换装后衣柜也会同步高亮。
+ * 鼠标停在看板娘身上：气泡里出现音乐控制（没放歌时可以直接开始放，放着时可以上一首 / 暂停 / 下一首）。
  * 用户切换后的角色、服装以及「是否退出」都存在 localStorage，二次访问会还原。
  *
  * 依赖顺序不能换：live2d.min.js → PIXI → cubism2 渲染器（后者要挂到 PIXI 上）。
@@ -138,6 +139,7 @@
     clearTimeout(tipTimer);
     clearTimeout(menuTimer);
     menuOpen = false;
+    musicMenuOpen = false;
     lastHover = null;
     tipPriority = -1;
     if (pinned && on) renderTip(pinned.text, pinned.choices);
@@ -153,6 +155,7 @@
     clearTimeout(tipTimer);
     clearTimeout(menuTimer);
     menuOpen = !!(choices && choices.length);       // 带选项的菜单：鼠标离开就尽快收起
+    musicMenuOpen = false;                          // showMusicMenu() 调完会再置回 true
     tipPriority = priority;
     renderTip(text, choices);
     tipExpired = false;
@@ -428,6 +431,7 @@
     }
     model.alpha = 1;                                  // 校正完成再显示，避免看到人物跳动
     if (!box) return;
+    modelBox = box;                                   // 记下人物外框，鼠标悬停检测用
     // 气泡：底边压在头顶上，水平居中对齐头部，不超出容器
     tipsEl.style.top = 'auto';
     tipsEl.style.bottom = Math.max(0, h - box.top - TIP_OVERLAP) + 'px';
@@ -585,6 +589,91 @@
       return ['我的新衣服好看嘛？' + outfitLabel(), '这套' + outfitLabel() + '怎么样？'];
     }, outfitChoices);
   }
+  /* ---- 鼠标停在看板娘身上：和音乐播放器互动 ---- */
+  // 模型区域是 pointer-events:none（不挡后面的页面），所以用 mousemove 对照人物外框做命中检测
+  var modelBox = null, overModel = false, dwellTimer = 0, moveRaf = 0, lastXY = null;
+  function musicApi() { return window.__mistMusic || null; }
+  function musicCtl() { return window.__mistMusicCtl || null; }
+  function trackInfo(ap) {
+    var a = ap && ap.list && ap.list.audios[ap.list.index];
+    return a ? '《' + a.name + '》' + (a.artist ? ' - ' + a.artist : '') : '';
+  }
+  function showMusicMenu() {
+    if (!on || pinned) return;                      // 音乐询问还没回答时，就让那个问题留着
+    var ap = musicApi(), ctl = musicCtl();
+    if (!ctl) return;
+    if (!ctl.consented) {
+      showMessage(['要听点音乐吗？我可以帮你放哦～', '安安静静的也不错，不过要不要来首歌？'], 3000, 12, [
+        { label: '▶ 播放音乐', primary: true, onSelect: function () {
+          ctl.start();
+          showMessage('好耶～音乐马上就来！', 3000, 12);
+        } },
+        { label: '不用了', onSelect: function () { showMessage('好的，想听的时候再摸摸我～', 2500, 12); } }
+      ]);
+      return;
+    }
+    if (!ap) { showMessage('音乐还在加载中，稍等一下下～', 2500, 12); return; }
+    var paused = ap.audio.paused;
+    showMessage((paused ? '音乐暂停中：' : '正在播放：') + trackInfo(ap), 3000, 12, [
+      { label: '⏮ 上一首', onSelect: function () { ap.skipBack(); ap.play(); refreshMusicMenu(); } },
+      { label: paused ? '▶ 继续' : '⏸ 暂停', primary: true, onSelect: function () { ap.toggle(); refreshMusicMenu(); } },
+      { label: '下一首 ⏭', onSelect: function () { ap.skipForward(); ap.play(); refreshMusicMenu(); } },
+      { label: '🎵 打开播放器', onSelect: function () { ctl.openPanel(); endMessage(); } }
+    ]);
+  }
+  var musicMenuOpen = false;
+  function refreshMusicMenu() {
+    setTimeout(function () { if (menuOpen && musicMenuOpen) { showMusicMenu(); musicMenuOpen = menuOpen; } }, 150);
+  }
+
+  function modelHit(x, y) {
+    if (!modelBox || !on || !model) return false;
+    var r = canvas.getBoundingClientRect();
+    var bw = modelBox.right - modelBox.left;
+    // 左右各收 15%：翅膀、飘带这类边缘部分不算「摸到她」
+    return x >= r.left + modelBox.left + bw * 0.15 && x <= r.left + modelBox.right - bw * 0.15 &&
+           y >= r.top + modelBox.top && y <= r.top + Math.min(modelBox.bottom, r.height);
+  }
+  function onModelMove() {
+    moveRaf = 0;
+    if (!lastXY) return;
+    // 鼠标在工具栏 / 气泡上时不算
+    var el = document.elementFromPoint(lastXY[0], lastXY[1]);
+    var onUi = el && (toolEl.contains(el) || tipsEl.contains(el));
+    var hit = !onUi && modelHit(lastXY[0], lastXY[1]);
+    if (hit === overModel) return;
+    overModel = hit;
+    clearTimeout(dwellTimer);
+    if (hit) {
+      menuStay();
+      dwellTimer = setTimeout(function () {       // 停留一小会儿才弹，路过不打扰
+        if (!overModel) return;
+        showMusicMenu();
+        musicMenuOpen = menuOpen;
+      }, 350);
+    } else if (musicMenuOpen) {
+      menuLeave();
+    }
+  }
+  document.addEventListener('mousemove', function (e) {
+    lastXY = [e.clientX, e.clientY];
+    if (!moveRaf) moveRaf = requestAnimationFrame(onModelMove);
+  }, { passive: true });
+  // 切歌时如果看板娘在、又没别的事，报一下歌名
+  document.addEventListener('mistgarden:music-ready', function () {
+    var ap = musicApi();
+    if (!ap || ap.__waifuBound) return;
+    ap.__waifuBound = true;
+    ap.on('listswitch', function () {
+      setTimeout(function () {
+        if (menuOpen && musicMenuOpen) { showMusicMenu(); musicMenuOpen = menuOpen; }
+        else showMessage('下一首是' + trackInfo(ap) + '～', 3500, 9);
+      }, 100);
+    });
+    ap.on('play', refreshMusicMenu);
+    ap.on('pause', refreshMusicMenu);
+  });
+
   var outfitBtn = toolEl.querySelector('[data-act="outfit"]');
   if (outfitBtn) {
     outfitBtn.addEventListener('mouseenter', showOutfitMenu);
