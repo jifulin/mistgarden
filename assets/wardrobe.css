@@ -1,0 +1,171 @@
+/* 雾光庭院 · 看板娘衣柜页 */
+:root {
+  --bg: #15161c;
+  --panel: rgba(255, 255, 255, .06);
+  --panel-border: rgba(255, 255, 255, .1);
+  --text: #e4e4e7;
+  --muted: rgba(255, 255, 255, .6);
+  --accent: #e0a060;
+  --accent-2: #6366f1;
+  --card: rgba(255, 255, 255, .05);
+  --card-hover: rgba(255, 255, 255, .1);
+  --thumb-bg: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, .12), rgba(255, 255, 255, .02) 70%);
+}
+[data-theme="light"] {
+  --bg: #f5f1ea;
+  --panel: rgba(255, 255, 255, .75);
+  --panel-border: rgba(0, 0, 0, .08);
+  --text: #1f2937;
+  --muted: rgba(0, 0, 0, .55);
+  --card: rgba(255, 255, 255, .8);
+  --card-hover: #fff;
+  --thumb-bg: radial-gradient(circle at 50% 35%, #fff, #efe7da 75%);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100vh;
+  font-family: 'Noto Sans SC', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+a { color: var(--accent); }
+
+.wd-header { padding: 20px 24px 8px; text-align: center; position: relative; }
+.wd-header h1 { margin: 4px 0; font-size: 24px; font-weight: 600; letter-spacing: 2px; }
+.wd-back { position: absolute; left: 24px; top: 24px; font-size: 14px; text-decoration: none; }
+.wd-back:hover { text-decoration: underline; }
+.wd-status { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.wd-status b { color: var(--accent); font-weight: 500; }
+
+.wd-main {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 24px 24px;
+  align-items: start;
+}
+
+/* 预览 */
+.wd-preview {
+  position: sticky;
+  top: 16px;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+}
+.wd-stage { position: relative; height: 420px; border-radius: 12px; background: var(--thumb-bg); overflow: hidden; }
+.wd-stage canvas { display: block; width: 100%; height: 100%; }
+.wd-stage-tip {
+  position: absolute; inset: auto 0 12px; text-align: center; font-size: 13px; color: var(--muted);
+  pointer-events: none;
+}
+.wd-stage-tip[hidden] { display: none; }
+.wd-preview-info { margin-top: 12px; text-align: center; }
+.wd-preview-name { font-size: 15px; font-weight: 500; min-height: 22px; word-break: break-all; }
+.wd-preview-actions { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+
+.wd-btn {
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.wd-btn:hover { background: var(--card-hover); }
+.wd-btn:active { transform: translateY(1px); }
+.wd-btn:disabled { opacity: .5; cursor: default; }
+.wd-btn-primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+.wd-btn-primary:hover { background: #d08a40; }
+.wd-btn:focus-visible, .wd-card:focus-visible, .wd-tab:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+/* 列表 */
+.wd-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.wd-tab {
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.wd-tab small { color: var(--muted); margin-left: 4px; }
+.wd-tab[aria-selected="true"] { color: #fff; background: var(--accent-2); border-color: var(--accent-2); }
+.wd-tab[aria-selected="true"] small { color: rgba(255, 255, 255, .8); }
+.wd-tab.is-wearing::after { content: ' ●'; color: var(--accent); }
+
+.wd-tools { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
+.wd-tools input {
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+}
+#wdFilter { flex: 1 1 220px; }
+.wd-jump { display: flex; gap: 6px; }
+.wd-jump input { width: 90px; }
+.wd-char-msg { margin: 6px 0 12px; font-size: 13px; color: var(--muted); }
+
+.wd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.wd-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  background: var(--card);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .15s;
+}
+.wd-card:hover { background: var(--card-hover); transform: translateY(-2px); }
+.wd-card.is-selected { border-color: var(--accent-2); }
+.wd-card.is-wearing { border-color: var(--accent); }
+.wd-card[hidden] { display: none; }
+.wd-thumb {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  background: var(--thumb-bg);
+  overflow: hidden;
+}
+.wd-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.wd-thumb .wd-spin {
+  position: absolute; inset: 0; margin: auto; width: 22px; height: 22px;
+  border: 2px solid var(--panel-border); border-top-color: var(--accent);
+  border-radius: 50%; animation: wd-spin 1s linear infinite;
+}
+.wd-card-no { position: absolute; left: 12px; top: 12px; font-size: 12px; padding: 0 6px; border-radius: 6px; background: rgba(0, 0, 0, .45); color: #fff; }
+.wd-card-badge { position: absolute; right: 12px; top: 12px; font-size: 12px; padding: 0 6px; border-radius: 6px; background: var(--accent); color: #fff; display: none; }
+.wd-card.is-wearing .wd-card-badge { display: block; }
+.wd-card-name { margin-top: 6px; font-size: 13px; line-height: 18px; word-break: break-all; }
+@keyframes wd-spin { to { transform: rotate(360deg); } }
+
+.wd-footer { padding: 16px 24px 28px; text-align: center; font-size: 12px; color: var(--muted); }
+
+@media (max-width: 800px) {
+  .wd-main { grid-template-columns: 1fr; padding: 8px 12px 16px; }
+  .wd-preview { position: static; }
+  .wd-stage { height: 320px; }
+  .wd-back { position: static; display: inline-block; margin-bottom: 4px; }
+  .wd-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wd-card, .wd-card:hover { transition: none; transform: none; }
+  .wd-thumb .wd-spin { animation: none; }
+}

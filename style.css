@@ -758,15 +758,15 @@ body {
     background: transparent !important;
   }
 
-  /* === Live2D 看板娘（右下角，纯装饰） === */
+  /* === Live2D 看板娘（右下角，仿原版 live2d-widget 的气泡 + 工具栏） === */
   .live2d-wrap {
     position: fixed;
     right: 0;
-    bottom: 64px;                     /* 抬到底部控件条上方，免得控件压在模型上 */
-    z-index: 5;                       /* 低于 .fixed-bottom(10)，控件浮在模型上面 */
-    width: min(40vw, 340px);
-    height: min(52vh, 480px);
-    pointer-events: none;             /* 不挡页面点击，也不做命中交互 */
+    bottom: 8px;                      /* 底部控件条此时已收进工具栏 */
+    z-index: 5;                       /* 低于 .fixed-bottom(10) */
+    width: min(40vw, 380px);          /* 比人物宽一些：翅膀 / 头发摆动时不被裁掉 */
+    height: min(50vh, 440px);
+    pointer-events: none;             /* 模型区域不挡页面点击，只有工具栏可点 */
   }
   .live2d-wrap[hidden] { display: none; }
   .live2d-canvas {
@@ -774,27 +774,144 @@ body {
     width: 100%;
     height: 100%;
   }
-  .live2d-tip {
-    position: absolute;
-    right: 16px;
-    bottom: 12px;
-    padding: 4px 10px;
-    font-size: 11px;
-    color: var(--btn-text);
-    background: var(--btn-bg);
-    border: 1px solid var(--btn-border);
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+  .waifu-tips {
+    position: absolute;                /* 位置由 live2d.js 贴着模型头顶计算 */
+    top: 0;
+    right: 40px;
+    width: min(250px, 30vw);
+    min-height: 70px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 24px;
+    color: #4a3f35;
+    word-break: break-all;
+    background-color: rgba(236, 217, 188, .5);
+    border: 1px solid rgba(224, 186, 140, .62);
+    border-radius: 12px;
+    box-shadow: 0 3px 15px 2px rgba(191, 158, 118, .2);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    transition: opacity 1s;
+    animation: waifu-shake 50s ease-in-out 5s infinite;
   }
-  .live2d-tip[hidden] { display: none; }
-  /* 看板娘关掉时按钮变淡，一眼能看出状态 */
-  .fixed-bottom button.is-off { opacity: 0.5; }
-  /* 手机上不加载看板娘（省流量，也不跟播放器挤），相关按钮一并藏掉 */
+  .waifu-tips.waifu-tips-active { opacity: 1; transition: opacity .2s; }
+  /* 带选项的气泡（音乐询问 / 换装菜单）要能点，其余时候气泡不挡鼠标 */
+  .waifu-tips { pointer-events: none; }
+  .waifu-tips.waifu-tips-active.has-choices { pointer-events: auto; animation: none; }
+  .waifu-choices { display: none; gap: 6px; margin: 6px 0 2px; flex-wrap: wrap; }
+  .waifu-tips.has-choices .waifu-choices { display: flex; }
+  .waifu-choice {
+    flex: 1 1 auto;
+    padding: 2px 10px;
+    font: inherit;
+    font-size: 13px;
+    line-height: 22px;
+    color: #5b4636;
+    background: rgba(255, 255, 255, .55);
+    border: 1px solid rgba(224, 186, 140, .8);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+  .waifu-choice:hover,
+  .waifu-choice:focus-visible { background: rgba(255, 255, 255, .85); color: #0684bd; outline: none; }
+  .waifu-choice.is-primary { color: #fff; background: #e0a060; border-color: #e0a060; }
+  .waifu-choice.is-primary:hover,
+  .waifu-choice.is-primary:focus-visible { color: #fff; background: #d08a40; }
+  .waifu-number { display: flex; flex: 1 1 100%; gap: 6px; margin: 0; }
+  .waifu-number input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 2px 8px;
+    font: inherit;
+    font-size: 13px;
+    line-height: 22px;
+    color: #5b4636;
+    background: rgba(255, 255, 255, .7);
+    border: 1px solid rgba(224, 186, 140, .8);
+    border-radius: 8px;
+  }
+  .waifu-number input:focus { outline: 2px solid rgba(6, 132, 189, .5); outline-offset: 0; }
+  .waifu-number .waifu-choice { flex: 0 0 auto; }
+  [data-theme="light"] .waifu-tips { color: #3b2f25; background-color: rgba(236, 217, 188, .75); }
+  .waifu-tool {
+    position: absolute;
+    right: 6px;                       /* 模型右侧，贴底排列，下方不留空 */
+    bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: .7;
+    transition: opacity .6s;
+    pointer-events: auto;
+  }
+  .waifu-tool:hover,
+  .waifu-tool:focus-within { opacity: 1; }
+  .waifu-tool button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .waifu-tool button[hidden] { display: none; }
+  .waifu-tool button[aria-pressed="false"] svg { opacity: .55; }
+  /* 看板娘显示时，底部控件条（随机背景 / 主题）已收进工具栏 */
+  body.waifu-on .fixed-bottom { display: none; }
+  .waifu-tool svg {
+    width: 24px;
+    height: 24px;
+    fill: #7b8c9d;
+    transition: fill .3s;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, .6));
+  }
+  .waifu-tool button:hover svg,
+  .waifu-tool button:focus-visible svg { fill: #0684bd; }
+  /* 退出后贴在右侧的小标签，悬停滑出，点击召回 */
+  .waifu-toggle {
+    position: fixed;
+    right: 0;
+    bottom: 140px;
+    z-index: 6;
+    width: 60px;
+    margin-right: -100px;
+    padding: 5px 5px 5px 2px;
+    font-size: 12px;
+    color: #fff;
+    background-color: #fa0;
+    border: 0;
+    border-radius: 5px;
+    writing-mode: vertical-rl;
+    text-align: left;
+    cursor: pointer;
+    transition: margin-right 1s;
+  }
+  .waifu-toggle.waifu-toggle-active { margin-right: -38px; }
+  .waifu-toggle.waifu-toggle-active:hover,
+  .waifu-toggle.waifu-toggle-active:focus-visible { margin-right: -20px; }
+  @keyframes waifu-shake {
+    2% { transform: translate(.5px, -1.5px) rotate(-.5deg); }
+    4% { transform: translate(.5px, 1.5px) rotate(1.5deg); }
+    6% { transform: translate(1.5px, 1.5px) rotate(1.5deg); }
+    8% { transform: translate(2.5px, 1.5px) rotate(.5deg); }
+    10% { transform: translate(.5px, 2.5px) rotate(.5deg); }
+    12% { transform: translate(1.5px, 1.5px) rotate(.5deg); }
+    14% { transform: translate(.5px, .5px) rotate(.5deg); }
+    16% { transform: translate(-1.5px, -.5px) rotate(1.5deg); }
+    18% { transform: translate(.5px, .5px) rotate(1.5deg); }
+    20% { transform: translate(2.5px, 2.5px) rotate(1.5deg); }
+    0%, 22%, 100% { transform: translate(0, 0) rotate(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .waifu-tips { animation: none; }
+  }
+  /* 手机上不加载看板娘（省流量，也不跟播放器挤） */
   @media (max-width: 640px) {
-    .live2d-wrap { display: none; }
-    .fixed-bottom #live2dBtn,
-    .fixed-bottom #live2dSwitch { display: none; }
+    .live2d-wrap,
+    .waifu-toggle { display: none; }
   }
 
   /* === 首访音乐询问：原生 dialog 位于顶层，未同意时音乐资源保持未加载 === */
@@ -974,4 +1091,3 @@ body {
       pointer-events: none;
     }
   }
-

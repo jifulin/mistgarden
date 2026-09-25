@@ -1,0 +1,1455 @@
+{
+ "_comment": "由 fghrsh/live2d_api 目录生成；模型走 jsDelivr CDN，本仓库不再存放模型文件",
+ "base": "https://fastly.jsdelivr.net/gh/fghrsh/live2d_api@02dc5b3/model/",
+ "default": {
+  "c": 1,
+  "o": 25,
+  "_note": "首次访问默认：Tia · maid black"
+ },
+ "characters": [
+  {
+   "name": "Pio",
+   "msg": "来自 Potion Maker 的 Pio 酱 ~",
+   "outfits": [
+    {
+     "name": "default",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/default-costume.png"
+     ]
+    },
+    {
+     "name": "animal racoon",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/animal-costume-racoon.png"
+     ]
+    },
+    {
+     "name": "animal",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/animal-costume.png"
+     ]
+    },
+    {
+     "name": "bunny girl red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/bunny-girl-costume-red.png"
+     ]
+    },
+    {
+     "name": "bunny girl",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/bunny-girl-costume.png"
+     ]
+    },
+    {
+     "name": "cake choco",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/cake-costume-choco.png"
+     ]
+    },
+    {
+     "name": "cake cream",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/cake-costume-cream.png"
+     ]
+    },
+    {
+     "name": "dress brown",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/dress-costume-brown.png"
+     ]
+    },
+    {
+     "name": "dress",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/dress-costume.png"
+     ]
+    },
+    {
+     "name": "elementary school navy",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/elementary-school-costume-navy.png"
+     ]
+    },
+    {
+     "name": "elementary school",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/elementary-school-costume.png"
+     ]
+    },
+    {
+     "name": "fall dress beige",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/fall-dress-costume-beige.png"
+     ]
+    },
+    {
+     "name": "fall dress brown",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/fall-dress-costume-brown.png"
+     ]
+    },
+    {
+     "name": "frill bikini green",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/frill-bikini-costume-green.png"
+     ]
+    },
+    {
+     "name": "frill bikini purple",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/frill-bikini-costume-purple.png"
+     ]
+    },
+    {
+     "name": "frill blouse green",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/frill-blouse-costume-green.png"
+     ]
+    },
+    {
+     "name": "frill blouse red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/frill-blouse-costume-red.png"
+     ]
+    },
+    {
+     "name": "furisode",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/furisode-costume.png"
+     ]
+    },
+    {
+     "name": "halloween",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/halloween-costume.png"
+     ]
+    },
+    {
+     "name": "hanbok pink",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/hanbok-costume-pink.png"
+     ]
+    },
+    {
+     "name": "hanbok red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/hanbok-costume-red.png"
+     ]
+    },
+    {
+     "name": "hanbok skyblue",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/hanbok-costume-skyblue.png"
+     ]
+    },
+    {
+     "name": "hanbok yellow",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/hanbok-costume-yellow.png"
+     ]
+    },
+    {
+     "name": "hanbok",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/hanbok-costume.png"
+     ]
+    },
+    {
+     "name": "healer",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/healer-costume.png"
+     ]
+    },
+    {
+     "name": "kids navy",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/kids-costume-navy.png"
+     ]
+    },
+    {
+     "name": "kids",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/kids-costume.png"
+     ]
+    },
+    {
+     "name": "maid red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/maid-costume-red.png"
+     ]
+    },
+    {
+     "name": "maid",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/maid-costume.png"
+     ]
+    },
+    {
+     "name": "new2015 pajamas",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/new2015-costume-pajamas.png"
+     ]
+    },
+    {
+     "name": "new2015",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/new2015-costume.png"
+     ]
+    },
+    {
+     "name": "night witch black",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/night-witch-costume-black.png"
+     ]
+    },
+    {
+     "name": "night witch gray",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/night-witch-costume-gray.png"
+     ]
+    },
+    {
+     "name": "nightsky",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/nightsky-costume.png"
+     ]
+    },
+    {
+     "name": "overalls white",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/overalls-costume-white.png"
+     ]
+    },
+    {
+     "name": "overalls",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/overalls-costume.png"
+     ]
+    },
+    {
+     "name": "pajamas pink",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/pajamas-costume-pink.png"
+     ]
+    },
+    {
+     "name": "pajamas",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/pajamas-costume.png"
+     ]
+    },
+    {
+     "name": "party dress brown",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/party-dress-costume-brown.png"
+     ]
+    },
+    {
+     "name": "party dress purple",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/party-dress-costume-purple.png"
+     ]
+    },
+    {
+     "name": "qipao pink",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/qipao-costume-pink.png"
+     ]
+    },
+    {
+     "name": "qipao red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/qipao-costume-red.png"
+     ]
+    },
+    {
+     "name": "ribbon dress red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/ribbon-dress-costume-red.png"
+     ]
+    },
+    {
+     "name": "ribbon dress yellow",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/ribbon-dress-costume-yellow.png"
+     ]
+    },
+    {
+     "name": "sailor black",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sailor-costume-black.png"
+     ]
+    },
+    {
+     "name": "sailor",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sailor-costume.png"
+     ]
+    },
+    {
+     "name": "sakura navy",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sakura-costume-navy.png"
+     ]
+    },
+    {
+     "name": "sakura",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sakura-costume.png"
+     ]
+    },
+    {
+     "name": "santa green",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/santa-costume-green.png"
+     ]
+    },
+    {
+     "name": "santa",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/santa-costume.png"
+     ]
+    },
+    {
+     "name": "sarori",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sarori-costume.png"
+     ]
+    },
+    {
+     "name": "school 2017 gray",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/school-2017-costume-gray.png"
+     ]
+    },
+    {
+     "name": "school 2017 yellow",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/school-2017-costume-yellow.png"
+     ]
+    },
+    {
+     "name": "school red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/school-costume-red.png"
+     ]
+    },
+    {
+     "name": "school",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/school-costume.png"
+     ]
+    },
+    {
+     "name": "sfc uniform red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sfc-uniform-costume-red.png"
+     ]
+    },
+    {
+     "name": "sfc uniform yellow",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sfc-uniform-costume-yellow.png"
+     ]
+    },
+    {
+     "name": "shaman black",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/shaman-costume-black.png"
+     ]
+    },
+    {
+     "name": "shaman blue",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/shaman-costume-blue.png"
+     ]
+    },
+    {
+     "name": "sinsiroad shop junior",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sinsiroad-shop-costume-junior.png"
+     ]
+    },
+    {
+     "name": "sinsiroad shop senior",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sinsiroad-shop-costume-senior.png"
+     ]
+    },
+    {
+     "name": "sorceress",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sorceress-costume.png"
+     ]
+    },
+    {
+     "name": "sporty hood black",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sporty-hood-costume-black.png"
+     ]
+    },
+    {
+     "name": "sporty hood blue",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sporty-hood-costume-blue.png"
+     ]
+    },
+    {
+     "name": "star witch brown",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/star-witch-costume-brown.png"
+     ]
+    },
+    {
+     "name": "star witch",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/star-witch-costume.png"
+     ]
+    },
+    {
+     "name": "succubus black",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/succubus-costume-black.png"
+     ]
+    },
+    {
+     "name": "succubus red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/succubus-costume-red.png"
+     ]
+    },
+    {
+     "name": "sukumizu white",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sukumizu-costume-white.png"
+     ]
+    },
+    {
+     "name": "sukumizu",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/sukumizu-costume.png"
+     ]
+    },
+    {
+     "name": "summer dress blue",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/summer-dress-costume-blue.png"
+     ]
+    },
+    {
+     "name": "summer dress white",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/summer-dress-costume-white.png"
+     ]
+    },
+    {
+     "name": "swimsuit 2017 navy",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/swimsuit-2017-costume-navy.png"
+     ]
+    },
+    {
+     "name": "swimsuit 2017 red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/swimsuit-2017-costume-red.png"
+     ]
+    },
+    {
+     "name": "tirami1",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/tirami1-costume.png"
+     ]
+    },
+    {
+     "name": "turtleneck red",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/turtleneck-costume-red.png"
+     ]
+    },
+    {
+     "name": "turtleneck",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/turtleneck-costume.png"
+     ]
+    },
+    {
+     "name": "valentine brown",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/valentine-costume-brown.png"
+     ]
+    },
+    {
+     "name": "valentine pink",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/valentine-costume-pink.png"
+     ]
+    },
+    {
+     "name": "winter coat 2017 brown",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/winter-coat-2017-costume-brown.png"
+     ]
+    },
+    {
+     "name": "winter coat 2017 white",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/winter-coat-2017-costume-white.png"
+     ]
+    },
+    {
+     "name": "winter coat pink",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/winter-coat-costume-pink.png"
+     ]
+    },
+    {
+     "name": "winter coat white",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/winter-coat-costume-white.png"
+     ]
+    },
+    {
+     "name": "winter white",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/winter-costume-white.png"
+     ]
+    },
+    {
+     "name": "winter",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/winter-costume.png"
+     ]
+    },
+    {
+     "name": "witch white",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/witch-costume-white.png"
+     ]
+    },
+    {
+     "name": "witch",
+     "model": "Potion-Maker/Pio",
+     "textures": [
+      "textures/witch-costume.png"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Tia",
+   "msg": "来自 Potion Maker 的 Tia 酱 ~",
+   "outfits": [
+    {
+     "name": "default",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/default-costume.png"
+     ]
+    },
+    {
+     "name": "bikini blue",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/bikini-costume-blue.png"
+     ]
+    },
+    {
+     "name": "bikini pink",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/bikini-costume-pink.png"
+     ]
+    },
+    {
+     "name": "blackcat",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/blackcat-costume.png"
+     ]
+    },
+    {
+     "name": "blazer black",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/blazer-costume-black.png"
+     ]
+    },
+    {
+     "name": "blazer brown",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/blazer-costume-brown.png"
+     ]
+    },
+    {
+     "name": "blueround",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/blueround-costume.png"
+     ]
+    },
+    {
+     "name": "bunny girl red",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/bunny-girl-costume-red.png"
+     ]
+    },
+    {
+     "name": "bunny girl",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/bunny-girl-costume.png"
+     ]
+    },
+    {
+     "name": "cami dress pink",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/cami-dress-costume-pink.png"
+     ]
+    },
+    {
+     "name": "cute pajamas purple",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/cute-pajamas-costume-purple.png"
+     ]
+    },
+    {
+     "name": "cute pajamas skyblue",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/cute-pajamas-costume-skyblue.png"
+     ]
+    },
+    {
+     "name": "frill blouse green",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/frill-blouse-costume-green.png"
+     ]
+    },
+    {
+     "name": "frill blouse red",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/frill-blouse-costume-red.png"
+     ]
+    },
+    {
+     "name": "halloween",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/halloween-costume.png"
+     ]
+    },
+    {
+     "name": "hanbok gorgeous",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/hanbok-costume-gorgeous.png"
+     ]
+    },
+    {
+     "name": "hanbok",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/hanbok-costume.png"
+     ]
+    },
+    {
+     "name": "hood gray",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/hood-costume-gray.png"
+     ]
+    },
+    {
+     "name": "hood red",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/hood-costume-red.png"
+     ]
+    },
+    {
+     "name": "jersey blue",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/jersey-costume-blue.png"
+     ]
+    },
+    {
+     "name": "jersey red",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/jersey-costume-red.png"
+     ]
+    },
+    {
+     "name": "knight",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/knight-costume.png"
+     ]
+    },
+    {
+     "name": "macaron dress green",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/macaron-dress-costume-green.png"
+     ]
+    },
+    {
+     "name": "macaron dress pink",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/macaron-dress-costume-pink.png"
+     ]
+    },
+    {
+     "name": "magical girl",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/magical-girl-costume.png"
+     ]
+    },
+    {
+     "name": "maid black",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/maid-costume-black.png"
+     ]
+    },
+    {
+     "name": "maid blue",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/maid-costume-blue.png"
+     ]
+    },
+    {
+     "name": "marine navy",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/marine-costume-navy.png"
+     ]
+    },
+    {
+     "name": "marine",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/marine-costume.png"
+     ]
+    },
+    {
+     "name": "nordic beige",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/nordic-costume-beige.png"
+     ]
+    },
+    {
+     "name": "nordic navy",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/nordic-costume-navy.png"
+     ]
+    },
+    {
+     "name": "nurse red",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/nurse-costume-red.png"
+     ]
+    },
+    {
+     "name": "nurse",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/nurse-costume.png"
+     ]
+    },
+    {
+     "name": "pajamas blue",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/pajamas-costume-blue.png"
+     ]
+    },
+    {
+     "name": "pajamas green",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/pajamas-costume-green.png"
+     ]
+    },
+    {
+     "name": "pushcat",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/pushcat-costume.png"
+     ]
+    },
+    {
+     "name": "sabori",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sabori-costume.png"
+     ]
+    },
+    {
+     "name": "sailor bikini black",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sailor-bikini-costume-black.png"
+     ]
+    },
+    {
+     "name": "sailor bikini white",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sailor-bikini-costume-white.png"
+     ]
+    },
+    {
+     "name": "sailor black",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sailor-costume-black.png"
+     ]
+    },
+    {
+     "name": "sailor",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sailor-costume.png"
+     ]
+    },
+    {
+     "name": "sakura navy",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sakura-costume-navy.png"
+     ]
+    },
+    {
+     "name": "sakura",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sakura-costume.png"
+     ]
+    },
+    {
+     "name": "santa",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/santa-costume.png"
+     ]
+    },
+    {
+     "name": "santa2016",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/santa2016-costume.png"
+     ]
+    },
+    {
+     "name": "sports bikini green",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sports-bikini-costume-green.png"
+     ]
+    },
+    {
+     "name": "sports bikini navy",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sports-bikini-costume-navy.png"
+     ]
+    },
+    {
+     "name": "spring dress brown",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/spring-dress-costume-brown.png"
+     ]
+    },
+    {
+     "name": "spring dress navy",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/spring-dress-costume-navy.png"
+     ]
+    },
+    {
+     "name": "sukumizu white",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sukumizu-costume-white.png"
+     ]
+    },
+    {
+     "name": "sukumizu",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sukumizu-costume.png"
+     ]
+    },
+    {
+     "name": "sulbim rainbow",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sulbim-costume-rainbow.png"
+     ]
+    },
+    {
+     "name": "sulbim snowflake",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/sulbim-costume-snowflake.png"
+     ]
+    },
+    {
+     "name": "summer uniform blue",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/summer-uniform-costume-blue.png"
+     ]
+    },
+    {
+     "name": "summer uniform green",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/summer-uniform-costume-green.png"
+     ]
+    },
+    {
+     "name": "thief",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/thief-costume.png"
+     ]
+    },
+    {
+     "name": "traveler brown",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/traveler-costume-brown.png"
+     ]
+    },
+    {
+     "name": "traveler white",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/traveler-costume-white.png"
+     ]
+    },
+    {
+     "name": "vampire real",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/vampire-costume-real.png"
+     ]
+    },
+    {
+     "name": "vampire",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/vampire-costume.png"
+     ]
+    },
+    {
+     "name": "warrior",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/warrior-costume.png"
+     ]
+    },
+    {
+     "name": "whiteday purple",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/whiteday-costume-purple.png"
+     ]
+    },
+    {
+     "name": "whiteday red",
+     "model": "Potion-Maker/Tia",
+     "textures": [
+      "textures/whiteday-costume-red.png"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "22 娘",
+   "msg": "来自 Bilibili Live 的 22 哦 ~",
+   "outfits": [
+    {
+     "name": "default",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/default-upper.png",
+      "texture_02/default-lower.png",
+      "texture_03/default-hat.png"
+     ]
+    },
+    {
+     "name": "cba-normal",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/cba-normal-upper.png",
+      "texture_02/cba-normal-lower.png",
+      "texture_03/cba-hat.png"
+     ]
+    },
+    {
+     "name": "cba-super",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/cba-super-upper.png",
+      "texture_02/cba-super-lower.png",
+      "texture_03/cba-hat.png"
+     ]
+    },
+    {
+     "name": "newyear",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/newyear-upper.png",
+      "texture_02/newyear-lower.png",
+      "texture_03/newyear-hat.png"
+     ]
+    },
+    {
+     "name": "school2017",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/school2017-upper.png",
+      "texture_02/school2017-lower.png",
+      "texture_03/school2017-hat.png"
+     ]
+    },
+    {
+     "name": "spring-2018",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/spring-2018-upper.png",
+      "texture_02/spring-2018-lower.png",
+      "texture_03/spring-2018-hat.png"
+     ]
+    },
+    {
+     "name": "summer2017-high",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/summer2017-high-upper.png",
+      "texture_02/summer2017-high-lower.png",
+      "texture_03/summer2017-hat.png"
+     ]
+    },
+    {
+     "name": "summer2017-low",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/summer2017-low-upper.png",
+      "texture_02/summer2017-low-lower.png",
+      "texture_03/summer2017-hat.png"
+     ]
+    },
+    {
+     "name": "tomo-high",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/tomo-high-upper.png",
+      "texture_02/tomo-high-lower.png",
+      "texture_03/tomo-high-hat.png"
+     ]
+    },
+    {
+     "name": "tomo-low",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/tomo-low-upper.png",
+      "texture_02/tomo-low-lower.png",
+      "texture_03/tomo-low-hat.png"
+     ]
+    },
+    {
+     "name": "valley2017",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/valley2017-upper.png",
+      "texture_02/valley2017-lower.png",
+      "texture_03/valley2017-hat.png"
+     ]
+    },
+    {
+     "name": "vdays",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/vdays-upper.png",
+      "texture_02/vdays-lower.png",
+      "texture_03/vdays-hat.png"
+     ]
+    },
+    {
+     "name": "xmas",
+     "model": "bilibili-live/22",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/xmas-upper.png",
+      "texture_02/xmas-lower.png",
+      "texture_03/xmas-hat.png"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "33 娘",
+   "msg": "来自 Bilibili Live 的 33 的说",
+   "outfits": [
+    {
+     "name": "default",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/default-upper.png",
+      "texture_02/default-lower.png",
+      "texture_03/default-hat.png"
+     ]
+    },
+    {
+     "name": "cba-normal",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/cba-normal-upper.png",
+      "texture_02/cba-normal-lower.png",
+      "texture_03/cba-hat.png"
+     ]
+    },
+    {
+     "name": "cba-super",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/cba-super-upper.png",
+      "texture_02/cba-super-lower.png",
+      "texture_03/cba-hat.png"
+     ]
+    },
+    {
+     "name": "newyear",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/newyear-upper.png",
+      "texture_02/newyear-lower.png",
+      "texture_03/newyear-hat.png"
+     ]
+    },
+    {
+     "name": "school2017",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/school2017-upper.png",
+      "texture_02/school2017-lower.png",
+      "texture_03/school2017-hat.png"
+     ]
+    },
+    {
+     "name": "spring-2018",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/spring-2018-upper.png",
+      "texture_02/spring-2018-lower.png",
+      "texture_03/spring-2018-hat.png"
+     ]
+    },
+    {
+     "name": "summer2017-high",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/summer2017-high-upper.png",
+      "texture_02/summer2017-high-lower.png",
+      "texture_03/summer2017-hat.png"
+     ]
+    },
+    {
+     "name": "summer2017-low",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/summer2017-low-upper.png",
+      "texture_02/summer2017-low-lower.png",
+      "texture_03/summer2017-hat.png"
+     ]
+    },
+    {
+     "name": "tomo-high",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/tomo-high-upper.png",
+      "texture_02/tomo-high-lower.png",
+      "texture_03/tomo-high-hat.png"
+     ]
+    },
+    {
+     "name": "tomo-low",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/tomo-low-upper.png",
+      "texture_02/tomo-low-lower.png",
+      "texture_03/tomo-low-hat.png"
+     ]
+    },
+    {
+     "name": "valley2017",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/valley2017-upper.png",
+      "texture_02/valley2017-lower.png",
+      "texture_03/valley2017-hat.png"
+     ]
+    },
+    {
+     "name": "vdays",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/vdays-upper.png",
+      "texture_02/vdays-lower.png",
+      "texture_03/vdays-hat.png"
+     ]
+    },
+    {
+     "name": "xmas",
+     "model": "bilibili-live/33",
+     "textures": [
+      "texture_00/closet-default-v2.png",
+      "texture_01/xmas-upper.png",
+      "texture_02/xmas-lower.png",
+      "texture_03/xmas-hat.png"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Shizuku",
+   "msg": "Shizuku Talk ！这里是 Shizuku ~",
+   "outfits": [
+    {
+     "name": "shizuku-48",
+     "model": "ShizukuTalk/shizuku-48"
+    },
+    {
+     "name": "shizuku-pajama",
+     "model": "ShizukuTalk/shizuku-pajama"
+    }
+   ]
+  },
+  {
+   "name": "超次元海王星",
+   "msg": "Nep! Nep! 超次元游戏：海王星 系列",
+   "outfits": [
+    {
+     "name": "neptune_classic",
+     "model": "HyperdimensionNeptunia/neptune_classic"
+    },
+    {
+     "name": "nepnep",
+     "model": "HyperdimensionNeptunia/nepnep"
+    },
+    {
+     "name": "neptune_santa",
+     "model": "HyperdimensionNeptunia/neptune_santa"
+    },
+    {
+     "name": "nepmaid",
+     "model": "HyperdimensionNeptunia/nepmaid"
+    },
+    {
+     "name": "nepswim",
+     "model": "HyperdimensionNeptunia/nepswim"
+    },
+    {
+     "name": "noir_classic",
+     "model": "HyperdimensionNeptunia/noir_classic"
+    },
+    {
+     "name": "noir",
+     "model": "HyperdimensionNeptunia/noir"
+    },
+    {
+     "name": "noir_santa",
+     "model": "HyperdimensionNeptunia/noir_santa"
+    },
+    {
+     "name": "noireswim",
+     "model": "HyperdimensionNeptunia/noireswim"
+    },
+    {
+     "name": "blanc_classic",
+     "model": "HyperdimensionNeptunia/blanc_classic"
+    },
+    {
+     "name": "blanc_normal",
+     "model": "HyperdimensionNeptunia/blanc_normal"
+    },
+    {
+     "name": "blanc_swimwear",
+     "model": "HyperdimensionNeptunia/blanc_swimwear"
+    },
+    {
+     "name": "vert_classic",
+     "model": "HyperdimensionNeptunia/vert_classic"
+    },
+    {
+     "name": "vert_normal",
+     "model": "HyperdimensionNeptunia/vert_normal"
+    },
+    {
+     "name": "vert_swimwear",
+     "model": "HyperdimensionNeptunia/vert_swimwear"
+    },
+    {
+     "name": "nepgear",
+     "model": "HyperdimensionNeptunia/nepgear"
+    },
+    {
+     "name": "nepgear_extra",
+     "model": "HyperdimensionNeptunia/nepgear_extra"
+    },
+    {
+     "name": "nepgearswim",
+     "model": "HyperdimensionNeptunia/nepgearswim"
+    },
+    {
+     "name": "histoire",
+     "model": "HyperdimensionNeptunia/histoire"
+    },
+    {
+     "name": "histoirenohover",
+     "model": "HyperdimensionNeptunia/histoirenohover"
+    }
+   ]
+  },
+  {
+   "name": "叢雲",
+   "msg": "艦隊これくしょん / 叢雲(むらくも)",
+   "outfits": [
+    {
+     "name": "default",
+     "model": "KantaiCollection/murakumo"
+    }
+   ]
+  }
+ ]
+}

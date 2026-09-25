@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>看板娘衣柜 · 雾光庭院</title>
+<link rel="icon" type="image/png" href="https://p.qlogo.cn/gh/741215938/741215938/640">
+<!-- 衣柜页：展示全部看板娘和服装。和主页通过 BroadcastChannel 互通：
+     这里点「给看板娘穿上」，主页右下角的看板娘会立刻换上；主页换装后这里也会同步高亮。
+     主页没开着时，选择会写进 localStorage，下次打开主页就穿这件。 -->
+<link rel="stylesheet" href="assets/wardrobe.css?v=20260925g">
+<script>
+  // 主题跟主页一致：会话里手动选过就用手动的，否则 6~18 点浅色
+  (function () {
+    var t = null;
+    try { t = sessionStorage.getItem('theme'); } catch (e) {}
+    var h = new Date().getHours();
+    if (t === 'light' || (t !== 'dark' && h >= 6 && h < 18)) document.documentElement.setAttribute('data-theme', 'light');
+  })();
+</script>
+</head>
+<body>
+<header class="wd-header">
+  <a class="wd-back" href="index.html" id="wdBack">← 回到雾光庭院</a>
+  <h1>看板娘衣柜</h1>
+  <p class="wd-status" id="wdStatus" role="status" aria-live="polite">正在连接主页的看板娘…</p>
+</header>
+
+<main class="wd-main">
+  <!-- 左侧：大预览 -->
+  <section class="wd-preview" aria-label="预览">
+    <div class="wd-stage">
+      <canvas id="wdCanvas" aria-label="看板娘预览"></canvas>
+      <div class="wd-stage-tip" id="wdStageTip">加载中…</div>
+    </div>
+    <div class="wd-preview-info">
+      <div class="wd-preview-name" id="wdPreviewName">—</div>
+      <div class="wd-preview-actions">
+        <button type="button" class="wd-btn" id="wdPrev" aria-label="上一件">‹</button>
+        <button type="button" class="wd-btn wd-btn-primary" id="wdWear">给看板娘穿上</button>
+        <button type="button" class="wd-btn" id="wdNext" aria-label="下一件">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 右侧：角色页签 + 服装网格 -->
+  <section class="wd-list" aria-label="服装列表">
+    <div class="wd-tabs" id="wdTabs" role="tablist" aria-label="角色"></div>
+    <div class="wd-tools">
+      <input type="search" id="wdFilter" placeholder="按名字筛选，比如 maid / 泳装写 swim" aria-label="按名字筛选服装">
+      <form id="wdJump" class="wd-jump" novalidate>
+        <input type="number" id="wdJumpNum" min="1" placeholder="序号" aria-label="输入序号跳转">
+        <button type="submit" class="wd-btn">跳到</button>
+      </form>
+    </div>
+    <p class="wd-char-msg" id="wdCharMsg"></p>
+    <div class="wd-grid" id="wdGrid" role="list"></div>
+  </section>
+</main>
+
+<footer class="wd-footer">
+  模型来自开源项目 <a href="https://github.com/fghrsh/live2d_api" target="_blank" rel="noopener noreferrer">fghrsh/live2d_api</a>，版权归原作者所有，仅供学习交流。
+</footer>
+
+<script src="assets/wardrobe.js?v=20260925g"></script>
+</body>
+</html>

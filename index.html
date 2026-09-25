@@ -9,7 +9,7 @@
 <!-- 资源版本号：改完 style.css / player.js / live2d.js 记得把下面几处的 ?v= 一起改
      （站点走 Cloudflare，CSS/JS 边缘缓存 4 小时；不换版本号的话会出现「新 HTML + 旧 CSS」，
       看板娘容器拿不到 position:fixed，整页被顶下去一大块） -->
-<link rel="stylesheet" href="style.css?v=20260924b">
+<link rel="stylesheet" href="style.css?v=20260925j">
 
 </head>
 <body>
@@ -20,13 +20,24 @@
 <!-- 压暗/渐变遮罩独立成层：若挂在 .bg-image 上，双层同时可见时会被叠加两次 -->
 <div class="bg-overlay"></div>
 
-<!-- Live2D 看板娘：整块 pointer-events:none，纯装饰，不会挡住页面点击 -->
+<!-- Live2D 看板娘（仿原版 live2d-widget）：文字气泡 + 模型 + 竖排工具栏；模型本身不挡页面点击 -->
 <div class="live2d-wrap" id="live2dWrap" hidden>
-  <div class="live2d-tip" id="live2dTip" role="status" aria-live="polite" hidden></div>
+  <div class="waifu-tips" id="waifuTips" role="status" aria-live="polite"></div>
   <canvas class="live2d-canvas" id="live2dCanvas"></canvas>
+  <div class="waifu-tool" id="waifuTool" role="toolbar" aria-label="看板娘工具栏">
+    <button type="button" data-act="hitokoto" title="一言" aria-label="一言"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm3 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm5 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg></button>
+    <button type="button" data-act="character" title="切换角色" aria-label="切换角色"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zm0 2c-4.4 0-8 2.2-8 5v2h16v-2c0-2.8-3.6-5-8-5z"/></svg></button>
+    <button type="button" data-act="outfit" title="换装" aria-label="换装"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3l3 2 3-2 5 3-2 5-2-1v11H8V10l-2 1-2-5 5-3z"/></svg></button>
+    <button type="button" data-act="photo" title="拍照" aria-label="拍照"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6l1.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.5L9 4zm3 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg></button>
+    <button type="button" data-act="theme" title="切换主题" aria-label="切换主题"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
+    <button type="button" data-act="background" title="随机背景" aria-label="随机背景"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 13h16l-5-6-4 4.5-2.5-2.5L4 17zm4-10a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg></button>
+    <button type="button" data-act="info" title="关于" aria-label="关于"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 5h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg></button>
+    <button type="button" data-act="quit" title="退出" aria-label="退出"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4z"/></svg></button>
+  </div>
 </div>
+<button class="waifu-toggle" id="waifuToggle" type="button" title="召唤看板娘" aria-label="召唤看板娘">看板娘</button>
 
-<!-- 底部固定控件组 -->
+<!-- 底部固定控件组：电脑端看板娘显示时收进看板娘工具栏（body.waifu-on 时隐藏），退出看板娘或在手机上才显示 -->
 <div class="fixed-bottom">
   <label class="toggle-wrap" for="bgToggle">
     <span class="toggle-label">随机背景</span>
@@ -36,8 +47,6 @@
     </span>
   </label>
   <button id="themeBtn" type="button" aria-label="浅色主题" aria-pressed="false">🌙</button>
-  <button id="live2dBtn" type="button" title="显示看板娘" aria-label="看板娘" aria-pressed="false">🎀</button>
-  <button id="live2dSwitch" type="button" title="切换模型" aria-label="切换看板娘模型" hidden>🔄</button>
 </div>
 
 <main class="container">
@@ -347,20 +356,37 @@
     const ask = document.getElementById('playAsk');
     const askYes = document.getElementById('playAskYes');
     const askNo = document.getElementById('playAskNo');
-    function showPlayAsk() {
-      if (!ask || ask.open) return;
+    function acceptMusic() {
+      consentGranted = true;
+      player.dataset.playOnReady = 'true';
+      if (ask.open) ask.close();
+      apply(true);            // 只在用户点了「播放」之后请求播放器和音源
+    }
+    function declineMusic() {
+      if (ask.open) ask.close();   // 不启动脚本、歌单、音源或音乐播放器
+    }
+    function showPlayDialog() {
+      if (!ask || ask.open || consentGranted) return;
       ask.showModal();
       askNo.focus();          // 默认聚焦不会触发加载的选项
     }
-    askYes.addEventListener('click', function () {
-      consentGranted = true;
-      player.dataset.playOnReady = 'true';
-      ask.close();
-      apply(true);            // 只在用户点了「播放」之后请求播放器和音源
-    });
-    askNo.addEventListener('click', function () {
-      ask.close();            // 不启动脚本、歌单、音源或音乐播放器
-    });
+    // 电脑端看板娘在场时，由她在气泡里问（常驻到用户选择为止）；
+    // 看板娘不在（手机、已退出、加载失败）或中途被关掉时，退回原来的弹窗。
+    function showPlayAsk() {
+      if (consentGranted) return;
+      const waifu = window.__live2dWidget;
+      if (waifu && waifu.askMusic({ accept: acceptMusic, decline: declineMusic, fallback: showPlayDialog })) return;
+      showPlayDialog();
+    }
+    function firstPlayAsk() {
+      const waifu = window.__live2dWidget;
+      if (!waifu) { showPlayDialog(); return; }
+      waifu.whenReady().then(function (ready) {
+        if (ready) showPlayAsk(); else showPlayDialog();
+      });
+    }
+    askYes.addEventListener('click', acceptMusic);
+    askNo.addEventListener('click', declineMusic);
     // 原生 dialog 的 Esc/cancel 也等同于关闭；没有同意就不会加载。
 
     function loadScript(src) {
@@ -618,7 +644,7 @@
       watchAudio();
       if (open) armIdle();
     });
-    showPlayAsk();
+    firstPlayAsk();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setupMobileBottomUI);
   else setupMobileBottomUI();
@@ -825,6 +851,6 @@
   <div id="musicPlayer" aria-live="polite">🎵 点击展开以加载音乐</div>
 </div>
 <button class="music-toggle" id="musicToggle" type="button" aria-expanded="false" aria-controls="musicPanel" aria-label="展开音乐播放器" title="展开音乐播放器">🎵</button>
-<script src="assets/live2d.js?v=20260924a"></script>
+<script src="assets/live2d.js?v=20260925j"></script>
 </body>
 </html>
