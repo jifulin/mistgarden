@@ -532,7 +532,7 @@ body {
   /* === 逐字歌词：音乐播放时接管一言的位置（assets/lyrics.js） === */
   /* 一言用的是父级 background-clip:text 渐变，歌词层要自带背景，
      所以接管时先把父级那层渐变关掉，交给 .hk-lyric 自己画。 */
-  .hitokoto .hk-lyric { display: none; }
+  .hitokoto .hk-lyric-box { display: none; }
   .hitokoto.is-lyric {
     background: none;
     -webkit-background-clip: border-box;
@@ -541,15 +541,20 @@ body {
     cursor: default;
   }
   .hitokoto.is-lyric .hk-text { display: none; }
-  .hitokoto.is-lyric .hk-lyric { display: inline-block; }
+  /* 两行歌词整体显示，并向上收一点，补偿多出来的一行高度 */
+  .hitokoto.is-lyric .hk-lyric-box {
+    display: inline-block;
+    transform: translateY(-6px);
+  }
   /* --lrc-p 由 JS 每帧写入（0%~100%），硬边渐变就是「已唱 / 未唱」的分界线，
      边界扫过文字即卡拉 OK 的逐字填充效果。 */
   .hk-lyric {
     --lrc-p: 0%;
     --lrc-done: #ffd3e1;
     --lrc-todo: rgba(255, 255, 255, 0.34);
+    display: block;
     max-width: 100%;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.02em;
     background-image: linear-gradient(90deg,
@@ -561,6 +566,14 @@ body {
     text-shadow: none;
     animation: lrcLineIn 0.32s ease both;
   }
+  /* 下一行：暗色预告，不参与填充 */
+  .hk-lyric-next {
+    --lrc-next: rgba(255, 255, 255, 0.5);
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--lrc-next);
+  }
   @keyframes lrcLineIn {
     from { opacity: 0; transform: translateY(3px); }
     to   { opacity: 1; transform: none; }
@@ -570,6 +583,9 @@ body {
   [data-theme="light"] .hk-lyric {
     --lrc-done: #be185d;
     --lrc-todo: rgba(15, 23, 42, 0.32);
+  }
+  [data-theme="light"] .hk-lyric-next {
+    --lrc-next: rgba(15, 23, 42, 0.45);
   }
   /* 不支持 background-clip:text 的浏览器：整行直接用已唱色，不做填充 */
   @supports not ((-webkit-background-clip: text) or (background-clip: text)) {

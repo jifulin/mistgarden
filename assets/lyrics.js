@@ -2,6 +2,10 @@
  * 逐字歌词 · mistgarden
  *
  * 音乐播放时，用当前歌词接管首页「一言」的位置；暂停 / 停止后自动还原成一言。
+ * 歌词区固定显示两行：当前行（逐字填充高亮）+ 下一行（暗色预告）；
+ * 没有下一行时用占位符顶着，两行高度不跳变。
+ * 鼠标悬停歌词时的提示交给看板娘的气泡（window.__live2dWidget.say）；
+ * 看板娘不在（手机 / 已退出 / 没加载出来）时退回浏览器原生 title。
  *
  * 关于「逐字」：音源接口（music-api.gdstudio.xyz）只返回行级 LRC，
  * 拿不到网易云那种带字级时间轴的 yrc，所以填充进度是按本行时长线性插值模拟的：
@@ -21,9 +25,16 @@
   if (!host || !textEl) return;
 
   // 歌词层：和一言同处一个按钮内，靠 .is-lyric 切换谁可见
+  // 两行结构：.hk-lyric-box > [.hk-lyric 当前行, .hk-lyric-next 下一行]
+  var boxEl = document.createElement('span');
+  boxEl.className = 'hk-lyric-box';
   var lineEl = document.createElement('span');
   lineEl.className = 'hk-lyric';
-  host.appendChild(lineEl);
+  var nextEl = document.createElement('span');
+  nextEl.className = 'hk-lyric-next';
+  boxEl.appendChild(lineEl);
+  boxEl.appendChild(nextEl);
+  host.appendChild(boxEl);
 
   var ap = null;
   var audio = null;
@@ -120,8 +131,29 @@
     return '♪ ' + (a.name || '未知曲目') + (a.artist ? ' — ' + a.artist : '');
   }
 
+  // 换行时新行从下方滑入（向上位移），避免整行生硬跳变；
+  // 用户系统开了「减弱动效」或不支持 WAAPI 时直接跳过。
+  function slideIn(el, dy, dur) {
+    if (!window.matchMedia || !el.animate) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    el.animate([
+      { opacity: 0, transform: 'translateY(' + dy + 'px)' },
+      { opacity: 1, transform: 'none' }
+    ], { duration: dur, easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)' });
+  }
+
   function setLine(text) {
-    if (lineEl.textContent !== text) lineEl.textContent = text;
+    if (lineEl.textContent === text) return;
+    lineEl.textContent = text;
+    slideIn(lineEl, 8, 280);
+  }
+
+  // 下一行：空文本用 nbsp 占位，避免两行高度在句间 / 歌末跳动
+  function setNext(text) {
+    var t = text || '\u00A0';
+    if (nextEl.textContent === t) return;
+    nextEl.textContent = t;
+    slideIn(nextEl, 5, 220);
   }
 
   function setProgress(p) {
@@ -143,7 +175,7 @@
     if (!active || !audio) return;
 
     if (!lyrics.length) {
-      if (curIndex !== -2) { curIndex = -2; setLine(songLabel()); }
+      if (curIndex !== -2) { curIndex = -2; setLine(songLabel()); setNext(''); }
       setProgress(1);
       return schedule();
     }
@@ -153,7 +185,7 @@
 
     if (i < 0) {
       // 前奏：先亮着歌名，进度条走前奏占比
-      if (curIndex !== -1) { curIndex = -1; setLine(songLabel()); }
+      if (curIndex !== -1) { curIndex = -1; setLine(songLabel()); setNext(''); }
       setProgress(lyrics[0].t > 0 ? t / lyrics[0].t : 1);
       return schedule();
     }
@@ -164,7 +196,7 @@
     // 间奏可能长达几十秒，填充时长封顶，免得一行字慢吞吞填半分钟
     var span = Math.max(0.3, Math.min(end - line.t, 8));
 
-    if (i !== curIndex) { curIndex = i; setLine(line.text); }
+    if (i !== curIndex) { curIndex = i; setLine(line.text); setNext(next ? next.text : ''); }
     setProgress((t - line.t) / span);
     schedule();
   }
@@ -175,13 +207,38 @@
 
   /* ======================= 接管 / 还原 ======================= */
 
+  // 悬停歌词时的提示词：看板娘在场就由她在气泡里说，不在场退回原生 title
+  var LRC_TIP = '正在播放 · 显示歌词（点击可刷新底下的一言）';
+  var waifuOk = null;          // 看板娘是否可用：null 未知 / true / false，问过一次就记住
+
+  function lyricTip() {
+    var w = window.__live2dWidget;
+    if (!w || typeof w.say !== 'function') { host.title = LRC_TIP; return; }
+    if (waifuOk === false) { host.title = LRC_TIP; return; }
+    host.title = '';           // 有看板娘就不弹浏览器原生提示
+    if (waifuOk === true) { w.say(LRC_TIP, 4000, 8); return; }
+    // 第一次悬停时看板娘可能还在懒加载：等 whenReady 有结果再决定
+    w.whenReady().then(function (ok) {
+      waifuOk = !!ok;
+      if (waifuOk) w.say(LRC_TIP, 4000, 8);
+      else host.title = LRC_TIP;
+    });
+  }
+
+  function lyricUntip() {
+    // 看板娘的气泡会自己过期；只有退回原生 title 时才需要清掉
+    if (waifuOk === false) host.title = '';
+  }
+
   function activate() {
     clearTimeout(offTimer);
     if (active) return;
     active = true;
     curIndex = -3;                                  // 强制下一帧重画
     host.classList.add('is-lyric');
-    host.title = '正在播放 · 显示歌词（点击可刷新底下的一言）';
+    host.title = '';
+    host.addEventListener('mouseenter', lyricTip);
+    host.addEventListener('mouseleave', lyricUntip);
     schedule();
   }
 
@@ -190,7 +247,10 @@
     active = false;
     host.classList.remove('is-lyric');
     host.title = '点击刷新';
+    host.removeEventListener('mouseenter', lyricTip);
+    host.removeEventListener('mouseleave', lyricUntip);
     lineEl.textContent = '';
+    nextEl.textContent = '';
     curIndex = -1;
     if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
   }
