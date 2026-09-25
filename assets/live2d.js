@@ -140,6 +140,7 @@
     clearTimeout(menuTimer);
     menuOpen = false;
     musicMenuOpen = false;
+    tipsEl.dataset.kind = '';
     lastHover = null;
     tipPriority = -1;
     if (pinned && on) renderTip(pinned.text, pinned.choices);
@@ -157,6 +158,7 @@
     menuOpen = !!(choices && choices.length);       // 带选项的菜单：鼠标离开就尽快收起
     musicMenuOpen = false;                          // showMusicMenu() 调完会再置回 true
     tipPriority = priority;
+    tipsEl.dataset.kind = '';
     renderTip(text, choices);
     tipExpired = false;
     tipTimer = setTimeout(function () {
@@ -575,6 +577,7 @@
       '这次要扮演什么呢？现在是' + outfitLabel(),
       '变装！要换哪一件？当前' + outfitLabel()
     ], 2500, 13, outfitChoices());
+    if (menuOpen) tipsEl.dataset.kind = 'outfit';
   }
   // step: 1 下一件，-1 上一件，0 随机（不会随到当前这件）；step 为 null 时直接换到 target 号
   function changeOutfit(step, target) {
@@ -651,6 +654,7 @@
         if (!overModel) return;
         showMusicMenu();
         musicMenuOpen = menuOpen;
+        if (menuOpen) tipsEl.dataset.kind = 'music';
       }, 350);
     } else if (musicMenuOpen) {
       menuLeave();
@@ -717,6 +721,7 @@
       { label: '👗 打开衣柜', primary: true, onSelect: openWardrobe },
       { label: '模型来源', title: ABOUT_URL, onSelect: function () { window.open(ABOUT_URL, '_blank', 'noopener'); } }
     ]);
+    if (menuOpen) tipsEl.dataset.kind = 'about';
   }
   var infoBtn = toolEl.querySelector('[data-act="info"]');
   if (infoBtn) {
@@ -724,6 +729,19 @@
     infoBtn.addEventListener('mouseleave', menuLeave);
     infoBtn.addEventListener('focus', showAboutMenu);
   }
+
+  // 兜底：鼠标在换装 / 关于按钮上移动时，如果气泡是空的或还停在音乐菜单，就补弹对应菜单。
+  // mouseenter 偶尔会被别的消息（音乐菜单、切歌提示、宽限计时）抢掉，这里保证「指着按钮就一定有气泡」
+  [[outfitBtn, 'outfit', showOutfitMenu], [infoBtn, 'about', showAboutMenu]].forEach(function (x) {
+    if (!x[0]) return;
+    x[0].addEventListener('mousemove', function () {
+      clearTimeout(dwellTimer); overModel = false;   // 指着按钮时不算摸看板娘
+      var active = tipsEl.classList.contains('waifu-tips-active');
+      var kind = tipsEl.dataset.kind || '';
+      if (pinned || kind === x[1]) { menuStay(); return; }
+      if (!active || kind === 'music') x[2]();
+    });
+  });
 
   /* ---- 和衣柜页互通：衣柜点「穿上」→ 主页换装；主页换装 → 衣柜高亮当前这件 ---- */
   var channel = null;
